@@ -1,0 +1,27 @@
+#map {
+    width: 200px;
+    height: 200px;
+    display: -webkit-box;
+}
+
+
+#panel {
+    margin-bottom: 20px;
+}
+
+.square {
+    width:20px;
+    height:20px;
+}
+
+.yellow {
+    background-color: rgb(200, 225, 55);
+}
+
+.red {
+    background-color: rgb(187, 34, 34);
+}
+
+.squareInProgress {
+    background-color: rgb(85, 155, 200) !important;
+}
