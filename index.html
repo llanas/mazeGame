@@ -10,11 +10,38 @@
     <script src="main.js" defer></script>
 </head>
 <body>
-    <div id="panel">
-        <input type="button" id="step" onclick="process()" value="Step"></input>
-    </div>
-    <div id="map">
-
+    <div class="content">
+        <div id="panel">
+            <div class="inputGroup">
+                <label for="mapWidth" class="inputLabel">Map Width</label>
+                <input type="number" name="mapWidth" id="mapWidth" value="3" />
+            </div><br/>
+            <div class="inputGroup">
+                <label for="mapHeight" class="inputLabel">Map Height</label>
+                <input type="number" name="mapHeight" id="mapHeight" value="3" />
+            </div><br/>
+            <div class="inputGroup">
+                <div>
+                    <input type="radio" id="buildAlgoInput" name="algoInput" value="build" onchange="setBuildAlgo()" checked>
+                    <label for="build">build</label>
+                </div>
+                <div>
+                    <input type="radio" id="bombAlgoInput" name="algoInput" value="bomb" onchange="setBombAlgo()">
+                    <label for="bomb">bomb</label>
+                </div>
+            </div>
+            <div class="actions">
+                <input type="button" onclick="initializeMapSquares()" value="Init" />
+                <input type="button" onclick="processAll()" value="Generer" />
+                <input type="button" onclick="process()" value="Step" />
+            </div>
+            <div id="console">
+                
+            </div>
+        </div>
+        <canvas id="map" width="60" height="60" hidden>
+    
+        </canvas>
     </div>
 </body>
 </html>
