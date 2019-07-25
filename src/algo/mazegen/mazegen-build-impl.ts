@@ -49,7 +49,7 @@ export default class BuildMazeGenerator implements MazeGenerator {
 
         if(neighboursAvailable.length !== 0) {
             let nextSquareToTreat = neighboursAvailable[Utils.getRandomInt(neighboursAvailable.length)];
-            Square.openDoorBetweenSquares(squareInProgress, nextSquareToTreat);
+            // Square.openDoorBetweenSquares(squareInProgress, nextSquareToTreat);
             this.squareTreatedPool.push(nextSquareToTreat);
         } else {
             this.squareTreatedPool.splice(this.squareTreatedPool.length - 1, 1);

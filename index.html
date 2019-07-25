@@ -6,8 +6,8 @@
     <title>MazeTest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
-    <script src="Square.js"></script>
-    <script src="main.js" defer></script>
+    <script src="dist/index.js" defer></script>
+    <script src="dist/test.js" defer></script>
 </head>
 <body>
     <div class="content">
@@ -31,9 +31,9 @@
                 </div>
             </div>
             <div class="actions">
-                <input type="button" onclick="initializeMapSquares()" value="Init" />
-                <input type="button" onclick="processAll()" value="Generer" />
-                <input type="button" onclick="process()" value="Step" />
+                <input type="button" onclick="init()" value="Init" />
+                <input type="button" onclick="process()" value="Generer" />
+                <input type="button" onclick="step()" value="Step" />
             </div>
             <div id="console">
                 
