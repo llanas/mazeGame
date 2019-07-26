@@ -26,6 +26,17 @@ export default class Square {
         Square.listSquares.push(this);
     }
 
+    getDoorsOpen(): Door[] {
+        let listDoorsOpen: Door[] = [];
+
+        if(this.topDoor.isOpen) listDoorsOpen.push(this.topDoor);
+        if(this.rightDoor.isOpen) listDoorsOpen.push(this.rightDoor);
+        if(this.bottomDoor.isOpen) listDoorsOpen.push(this.bottomDoor);
+        if(this.leftDoor.isOpen) listDoorsOpen.push(this.leftDoor);
+        
+        return listDoorsOpen;
+    }
+
     getColor(): string {
         if(this.isInSolutionPath) {
             return 'rgb(125, 125, 200)'

@@ -1,5 +1,7 @@
 import Square from "./square";
 import Door from "./door";
+import Utils from "../utils/utils";
+import TreeNode from "./treeNode";
 
 export default class MazeGrid {
     
@@ -9,6 +11,7 @@ export default class MazeGrid {
 
     listSquares: Square[] = [];
     listDoors: Door[] = [];
+    treeNode: TreeNode = null;
 
     resetMaze() {
         this.listSquares = [];
@@ -71,6 +74,19 @@ export default class MazeGrid {
         return this.grid[Math.floor(position / this.mazeWidth)][position % this.mazeHeight];
     }
 
+    getSquareByDoor(basedSquare: Square, door: Door): Square {
+        let xPosition;
+        let yPosition;
+        if(door.isVertical) {
+            xPosition = (door.x === basedSquare.x) ? door.x - 1 : door.x;
+            yPosition = door.y;
+        } else {
+            xPosition = door.x;
+            yPosition = (door.y === basedSquare.y) ? door.y - 1 : door.y
+        }
+        return this.getSquare(xPosition, yPosition);
+    }
+
     openDoorBetweenSquares(squareMax: Square, squareMin: Square): void {
         if(squareMin.position > squareMax.position) {
             let squareTemp = squareMax;
@@ -90,6 +106,58 @@ export default class MazeGrid {
                 squareMax.isTreated = true;
                 break;
         }
+    }
+
+    generateTree() {
+        this.treeNode = this.buildNodeTree(null, this.listSquares[0]);
+    }
+
+    buildNodeTree(nodeParent: TreeNode, square: Square): TreeNode {
+        let newNode = new TreeNode(nodeParent, square);
+        let listDoorsOpen = square.getDoorsOpen();
+        for (let i = 0; i < listDoorsOpen.length; i++) {
+            if(nodeParent != null && this.getSquareByDoor(square, listDoorsOpen[i]) === nodeParent.square) {
+                continue;
+            } else {
+                let childNode = this.buildNodeTree(newNode, this.getSquareByDoor(square, listDoorsOpen[i]));
+                newNode.childrens.push([childNode]);
+            }
+        }
+        return newNode;
+    }
+
+    foundNodeBySquare(square: Square, treeNodeIterator: TreeNode): TreeNode {
+        let node = null;
+        if(treeNodeIterator.square == square) {
+            node = treeNodeIterator;
+        } else {
+            for (let i = 0; i < treeNodeIterator.childrens.length; i++) {
+                for (let y = 0; y < treeNodeIterator.childrens[i].length; y++) {
+                    node = this.foundNodeBySquare(square, treeNodeIterator.childrens[i][y]);
+                }
+            }
+        }
+        return node;
+    }
+
+    foundPathBetweenSquares(squareA: Square, squareB: Square): Square[] {
+        let pathMap = new Map();
+        let solutionPath: Square[] = [];
+        let squareInProgress = squareA;
+        let nextSquare: Square = null;
+        do {
+            let listDoorsOpen = squareInProgress.getDoorsOpen();
+            if(listDoorsOpen.length === 1) {
+                solutionPath.pop();
+                nextSquare = solutionPath[solutionPath.length];
+            } else {
+                let rand = (listDoorsOpen.length === 1) ? 0 : Utils.getRandomInt(listDoorsOpen.length);
+                nextSquare = this.getSquareByDoor(squareInProgress, listDoorsOpen[rand]);
+                squareInProgress = nextSquare;
+                solutionPath.push(squareInProgress);
+            }
+        } while(nextSquare != squareB);
+        return solutionPath;
     }
 
     private _buildSquare(_positionX: number, _positionY: number): Square {

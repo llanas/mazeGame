@@ -49,6 +49,11 @@ export function step() {
     }
 }
 
+export function solution() {
+    console.dir(maze.generateTree());
+    console.dir(maze.foundNodeBySquare(maze.listSquares[maze.listSquares.length], maze.treeNode));
+}
+
 function _getMazeGenAlgo(): IMazeGenerator {
     let _algoGenInput = <HTMLInputElement> document.querySelector('input[name="algoInput"]:checked');
     switch(_algoGenInput.value) {
