@@ -6,34 +6,34 @@
     <title>MazeTest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="dist/runtime.js"></script>
     <script src="dist/index.js" defer></script>
-    <script src="dist/test.js" defer></script>
 </head>
 <body>
     <div class="content">
         <div id="panel">
             <div class="inputGroup">
                 <label for="mapWidth" class="inputLabel">Map Width</label>
-                <input type="number" name="mapWidth" id="mapWidth" value="3" />
+                <input type="number" name="mapWidth" id="mapWidth" value="10" />
             </div><br/>
             <div class="inputGroup">
                 <label for="mapHeight" class="inputLabel">Map Height</label>
-                <input type="number" name="mapHeight" id="mapHeight" value="3" />
+                <input type="number" name="mapHeight" id="mapHeight" value="10" />
             </div><br/>
             <div class="inputGroup">
                 <div>
-                    <input type="radio" id="buildAlgoInput" name="algoInput" value="build" onchange="setBuildAlgo()" checked>
+                    <input type="radio" id="buildAlgoInput" name="algoInput" value="build" checked>
                     <label for="build">build</label>
                 </div>
                 <div>
-                    <input type="radio" id="bombAlgoInput" name="algoInput" value="bomb" onchange="setBombAlgo()">
+                    <input type="radio" id="bombAlgoInput" name="algoInput" value="bomb">
                     <label for="bomb">bomb</label>
                 </div>
             </div>
             <div class="actions">
-                <input type="button" onclick="init()" value="Init" />
-                <input type="button" onclick="process()" value="Generer" />
-                <input type="button" onclick="step()" value="Step" />
+                <input type="button" onclick="index.init()" value="Init" />
+                <input type="button" onclick="index.process()" value="Generer" />
+                <input type="button" onclick="index.step()" value="Step" />
             </div>
             <div id="console">
                 

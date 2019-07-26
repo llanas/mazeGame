@@ -2,37 +2,14 @@ import Door from "./door";
 
 export default class Square {
 
-    static listSquares: Square[] = [];
-    
-    static width: number = 20;
-    static height: number = 20;
-
-    // static openDoorBetweenSquares(squareMax: Square, squareMin: Square): void {
-    //     if(squareMin.position > squareMax.position) {
-    //         let squareTemp = squareMax;
-    //         squareMax = squareMin;
-    //         squareMin = squareTemp;
-    //     }
-
-    //     switch(squareMax.position - squareMin.position) {
-    //         case 1: 
-    //             squareMin.bottomDoor.open();
-    //             squareMin.isTreated = true;
-    //             squareMax.isTreated = true;
-    //             break;
-    //         case mapWidth:
-    //             squareMin.rightDoor.open();
-    //             squareMin.isTreated = true;
-    //             squareMax.isTreated = true;
-    //             break;
-    //     }
-    // }
+    public static listSquares: Square[] = [];
 
     position: number;
     number: number;
     x: number;
     y: number;
     isTreated: boolean;
+    isInSolutionPath: boolean;
 
     topDoor: Door;
     rightDoor: Door;
@@ -50,6 +27,10 @@ export default class Square {
     }
 
     getColor(): string {
-        return (this.isTreated) ? 'rgb(200, 225, 55)' : 'rgb(220, 90, 90)';
+        if(this.isInSolutionPath) {
+            return 'rgb(125, 125, 200)'
+        } else{
+            return (this.isTreated) ? 'rgb(200, 225, 55)' : 'rgb(220, 90, 90)';
+        }
     }
 }

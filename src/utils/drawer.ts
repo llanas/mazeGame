@@ -2,6 +2,8 @@ import MazeGrid from "../model/maze-grid";
 import Square from "../model/square";
 import Door from "../model/door";
 
+const squareSize = 20;
+
 export default class Drawer {
 
     canvas: HTMLCanvasElement;
@@ -16,11 +18,17 @@ export default class Drawer {
         }
     }
 
+    display() {
+        this.canvas.hidden = false;
+    }
+
     drawMaze(_mazeGrid: MazeGrid): void {
         if(_mazeGrid != null && _mazeGrid.grid.length != 0) {
+            this.canvas.width = _mazeGrid.mazeWidth * squareSize;
+            this.canvas.height = _mazeGrid.mazeHeight * squareSize;
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            for (let x = 0; x < _mazeGrid.grid.length; x++) {
-                for (let y = 0; y < _mazeGrid.grid[x].length; y++) {
+            for (let x = 0; x < _mazeGrid.mazeWidth; x++) {
+                for (let y = 0; y < _mazeGrid.mazeHeight; y++) {
                     this.drawSquare(_mazeGrid.grid[x][y]);
                 }
             }
@@ -32,17 +40,17 @@ export default class Drawer {
 
     drawSquare(_square: Square): void {
         this.context.fillStyle = _square.getColor();
-        this.context.fillRect(_square.x * Square.width, _square.y * Square.height, Square.width, Square.height);
+        this.context.fillRect(_square.x * squareSize, _square.y * squareSize, squareSize, squareSize);
     }
 
     drawDoor(_door: Door): void {
         if (!_door.isOpen) {
             this.context.fillStyle = 'rgb(0,0,0)';
             if (_door.isVertical) {
-                this.context.fillRect((_door.x * Square.width) - 1, _door.y * Square.height, 2, Square.height);
+                this.context.fillRect((_door.x * squareSize) - 1, _door.y * squareSize, 1, squareSize);
             }
             else {
-                this.context.fillRect(_door.x * Square.width, (_door.y * Square.height) - 1, Square.width, 2);
+                this.context.fillRect(_door.x * squareSize, (_door.y * squareSize) - 1, squareSize, 1);
             }
         }
     }

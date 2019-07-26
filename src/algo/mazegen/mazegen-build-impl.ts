@@ -1,9 +1,9 @@
-import MazeGenerator from "./mazegen-interface";
+import IMazeGenerator from "./mazegen-interface";
 import MazeGrid from "../../model/maze-grid";
 import Square from "../../model/square";
 import Utils from "../../utils/utils";
 
-export default class BuildMazeGenerator implements MazeGenerator {
+export default class BuildMazeGenerator implements IMazeGenerator {
 
     isGenerationOver: boolean;
     mazeGrid: MazeGrid;
@@ -49,9 +49,11 @@ export default class BuildMazeGenerator implements MazeGenerator {
 
         if(neighboursAvailable.length !== 0) {
             let nextSquareToTreat = neighboursAvailable[Utils.getRandomInt(neighboursAvailable.length)];
-            // Square.openDoorBetweenSquares(squareInProgress, nextSquareToTreat);
+            nextSquareToTreat.isInSolutionPath = true;
+            this.mazeGrid.openDoorBetweenSquares(squareInProgress, nextSquareToTreat);
             this.squareTreatedPool.push(nextSquareToTreat);
         } else {
+            this.squareTreatedPool[this.squareTreatedPool.length - 1].isInSolutionPath = false;
             this.squareTreatedPool.splice(this.squareTreatedPool.length - 1, 1);
         }
         if(this.squareTreatedPool.length === 0) {

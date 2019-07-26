@@ -1,19 +1,18 @@
-var HtmlWebpackPlugin = require('html-webpack-plugin');
 var path = require('path');
 
 module.exports = {
-    mode: "none",
-    // devtool: "source-map",
+    mode: "development",
+    devtool: "source-map",
     // Change to your "entry-point".
     entry: {
-        index: './src/index',
-        test: './src/test'
+        index: './src/index'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         publicPath: '/assets/',
-        library: "[name]"
+        library: '[name]',
+        chunkFilename: "[name].js"
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']
@@ -33,21 +32,6 @@ module.exports = {
         ],
     },
     optimization: {
-        splitChunks: {
-            cacheGroups: {
-                // Split vendor code to its own chunk(s)
-                vendors: {
-                  test: /[\\/]node_modules[\\/]/i,
-                  chunks: "all"
-                },
-                // Split code common to all chunks to its own chunk
-                commons: {
-                  name: "commons",    // The name of the chunk containing all common code
-                  chunks: "initial",  // TODO: Document
-                  minChunks: 2        // This is the number of modules
-                }
-              }
-        },
         runtimeChunk: {
             name: 'runtime'
         }

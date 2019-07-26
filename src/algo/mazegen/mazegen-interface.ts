@@ -1,6 +1,6 @@
 import MazeGrid from "../../model/maze-grid";
 
-export default interface MazeGenerator{
+export default interface IMazeGenerator {
 
     isGenerationOver: boolean;
     mazeGrid: MazeGrid;

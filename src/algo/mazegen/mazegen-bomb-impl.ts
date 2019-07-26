@@ -1,10 +1,10 @@
-import MazeGenerator from "./mazegen-interface";
+import IMazeGenerator from "./mazegen-interface";
 import MazeGrid from "../../model/maze-grid";
 import Square from "../../model/square";
 import Utils from "../../utils/utils";
 import Door from "../../model/door";
 
-export default class BombMazeGenerator implements MazeGenerator {
+export default class BombMazeGenerator implements IMazeGenerator {
     
     isGenerationOver: boolean;
     mazeGrid: MazeGrid;
@@ -14,7 +14,7 @@ export default class BombMazeGenerator implements MazeGenerator {
     constructor(_mazeGrid: MazeGrid) {
         this.mazeGrid = _mazeGrid;
         this.isGenerationOver = false;
-        this.listDoorsAvailable = Door.listDoors.filter(door => door.isOpenable);
+        this.listDoorsAvailable = _mazeGrid.listDoors.filter(door => door.isOpenable);
     }
 
     step(): void {
@@ -30,17 +30,17 @@ export default class BombMazeGenerator implements MazeGenerator {
     
         if(squareMin.number < squareMax.number) {
             squareMin.isTreated = true;
-            Square.listSquares.filter(square => square.number === squareMax.number).forEach(square => square.number = squareMin.number);
+            this.mazeGrid.listSquares.filter(square => square.number === squareMax.number).forEach(square => square.number = squareMin.number);
             squareMax.isTreated = true;
             doorInProgress.open();
         } else if(squareMin.number > squareMax.number) {
             squareMin.isTreated = true;
-            Square.listSquares.filter(square => square.number === squareMin.number).forEach(square => square.number = squareMax.number);
+            this.mazeGrid.listSquares.filter(square => square.number === squareMin.number).forEach(square => square.number = squareMax.number);
             squareMax.isTreated = true;
             doorInProgress.open();
         }
         this.listDoorsAvailable.splice(rand, 1);
-        if(this.mazeGrid.listSquares.filter(square => square.number != 0).length != 0) {
+        if(this.mazeGrid.listSquares.filter(square => square.number != 0).length == 0) {
             this.isGenerationOver = true;
         }
     }

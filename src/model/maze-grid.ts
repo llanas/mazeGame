@@ -7,8 +7,17 @@ export default class MazeGrid {
     mazeHeight: number;
     grid: Square[][] = [];
 
-    listSquares: Square[];
-    listDoors: Door[];
+    listSquares: Square[] = [];
+    listDoors: Door[] = [];
+
+    resetMaze() {
+        this.listSquares = [];
+        this.listDoors = [];
+        this.grid = [];
+        
+        this.generateGrid();
+        this.generateDoors();
+    }
 
     constructor(_mazeWidth: number, _mazeHeight: number) {
         this.mazeWidth = _mazeWidth;
@@ -18,19 +27,18 @@ export default class MazeGrid {
         this.generateDoors();
     }
 
-    generateGrid(): void {
+    private generateGrid(): void {
         for(let x = 0; x < this.mazeWidth; x++) {
             let colomn: Square[] = [];
             this.grid.push(colomn);
             for(let y = 0; y < this.mazeHeight; y++) {
                 let square = this._buildSquare(x, y);
-                this.listSquares.push(square);
                 colomn.push(square);
             }
         }
     }
 
-    generateDoors() {
+    private generateDoors() {
         for (let i = 0; i < this.listSquares.length; i++) {
             const square = this.listSquares[i];
 
@@ -46,8 +54,8 @@ export default class MazeGrid {
                 square.leftDoor = this._buildDoor(square.x, square.y, true, false);
             }
 
-            square.rightDoor = this._buildDoor(square.x, square.y, true, square.x !== this.mazeWidth - 1);
-            square.bottomDoor = this._buildDoor(square.x, square.y, true, square.y !== this.mazeHeight - 1);
+            square.rightDoor = this._buildDoor(square.x + 1, square.y, true, square.x !== this.mazeWidth - 1);
+            square.bottomDoor = this._buildDoor(square.x, square.y + 1, false, square.y !== this.mazeHeight - 1);
         }
     }
 
@@ -61,6 +69,27 @@ export default class MazeGrid {
 
     getSquareByPosition(position: number): Square {
         return this.grid[Math.floor(position / this.mazeWidth)][position % this.mazeHeight];
+    }
+
+    openDoorBetweenSquares(squareMax: Square, squareMin: Square): void {
+        if(squareMin.position > squareMax.position) {
+            let squareTemp = squareMax;
+            squareMax = squareMin;
+            squareMin = squareTemp;
+        }
+
+        switch(squareMax.position - squareMin.position) {
+            case 1: 
+                squareMin.bottomDoor.open();
+                squareMin.isTreated = true;
+                squareMax.isTreated = true;
+                break;
+            case this.mazeWidth:
+                squareMin.rightDoor.open();
+                squareMin.isTreated = true;
+                squareMax.isTreated = true;
+                break;
+        }
     }
 
     private _buildSquare(_positionX: number, _positionY: number): Square {
