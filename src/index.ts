@@ -3,6 +3,7 @@ import Drawer from "./utils/drawer";
 import IMazeGenerator from "./algo/mazegen/mazegen-interface";
 import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
+import TreeNode from "./model/treeNode";
 
 let maze: MazeGrid = null;
 let mazeGenAlgo: IMazeGenerator;
@@ -50,8 +51,8 @@ export function step() {
 }
 
 export function solution() {
-    console.dir(maze.generateTree());
-    console.dir(maze.foundNodeBySquare(maze.listSquares[maze.listSquares.length], maze.treeNode));
+    let treeNode = new TreeNode(maze, maze.getSquareByPosition(0), maze.listSquares[maze.listSquares.length - 1]);
+    console.dir(treeNode);
 }
 
 function _getMazeGenAlgo(): IMazeGenerator {

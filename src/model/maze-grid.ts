@@ -108,58 +108,6 @@ export default class MazeGrid {
         }
     }
 
-    generateTree() {
-        this.treeNode = this.buildNodeTree(null, this.listSquares[0]);
-    }
-
-    buildNodeTree(nodeParent: TreeNode, square: Square): TreeNode {
-        let newNode = new TreeNode(nodeParent, square);
-        let listDoorsOpen = square.getDoorsOpen();
-        for (let i = 0; i < listDoorsOpen.length; i++) {
-            if(nodeParent != null && this.getSquareByDoor(square, listDoorsOpen[i]) === nodeParent.square) {
-                continue;
-            } else {
-                let childNode = this.buildNodeTree(newNode, this.getSquareByDoor(square, listDoorsOpen[i]));
-                newNode.childrens.push([childNode]);
-            }
-        }
-        return newNode;
-    }
-
-    foundNodeBySquare(square: Square, treeNodeIterator: TreeNode): TreeNode {
-        let node = null;
-        if(treeNodeIterator.square == square) {
-            node = treeNodeIterator;
-        } else {
-            for (let i = 0; i < treeNodeIterator.childrens.length; i++) {
-                for (let y = 0; y < treeNodeIterator.childrens[i].length; y++) {
-                    node = this.foundNodeBySquare(square, treeNodeIterator.childrens[i][y]);
-                }
-            }
-        }
-        return node;
-    }
-
-    foundPathBetweenSquares(squareA: Square, squareB: Square): Square[] {
-        let pathMap = new Map();
-        let solutionPath: Square[] = [];
-        let squareInProgress = squareA;
-        let nextSquare: Square = null;
-        do {
-            let listDoorsOpen = squareInProgress.getDoorsOpen();
-            if(listDoorsOpen.length === 1) {
-                solutionPath.pop();
-                nextSquare = solutionPath[solutionPath.length];
-            } else {
-                let rand = (listDoorsOpen.length === 1) ? 0 : Utils.getRandomInt(listDoorsOpen.length);
-                nextSquare = this.getSquareByDoor(squareInProgress, listDoorsOpen[rand]);
-                squareInProgress = nextSquare;
-                solutionPath.push(squareInProgress);
-            }
-        } while(nextSquare != squareB);
-        return solutionPath;
-    }
-
     private _buildSquare(_positionX: number, _positionY: number): Square {
         let newSquare = new Square(this.listSquares.length, _positionX, _positionY);
         this.listSquares.push(newSquare);
