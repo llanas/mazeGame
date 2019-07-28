@@ -1,22 +1,21 @@
 import Square from "./square";
 import Door from "./door";
-import Utils from "../utils/utils";
-import TreeNode from "./treeNode";
 
 export default class MazeGrid {
     
-    mazeWidth: number;
-    mazeHeight: number;
-    grid: Square[][] = [];
+    public mazeWidth: number;
+    public mazeHeight: number;
+    public grid: Square[][] = [];
+    public isFullyGenerated: boolean = false;
 
-    listSquares: Square[] = [];
-    listDoors: Door[] = [];
-    treeNode: TreeNode = null;
+    public listSquares: Square[] = [];
+    public listDoors: Door[] = [];
 
     resetMaze() {
         this.listSquares = [];
         this.listDoors = [];
         this.grid = [];
+        this.isFullyGenerated = false;
         
         this.generateGrid();
         this.generateDoors();
@@ -71,23 +70,31 @@ export default class MazeGrid {
     }
 
     getSquareByPosition(position: number): Square {
-        return this.grid[Math.floor(position / this.mazeWidth)][position % this.mazeHeight];
+        return this.listSquares[position];
+        // return this.grid[Math.round(position / (this.mazeWidth / this.mazeHeight))][(position % this.mazeHeight) - 1];
     }
 
     getSquareByDoor(basedSquare: Square, door: Door): Square {
         let xPosition;
         let yPosition;
-        if(door.isVertical) {
-            xPosition = (door.x === basedSquare.x) ? door.x - 1 : door.x;
-            yPosition = door.y;
+        if(door.isOpenable) {
+            if(door.isVertical) {
+                xPosition = (door.x === basedSquare.x) ? door.x - 1 : door.x;
+                yPosition = door.y;
+            } else {
+                xPosition = door.x;
+                yPosition = (door.y === basedSquare.y) ? door.y - 1 : door.y
+            }
+            return this.getSquare(xPosition, yPosition);
         } else {
-            xPosition = door.x;
-            yPosition = (door.y === basedSquare.y) ? door.y - 1 : door.y
+            throw "La porte n'est pas ouvrable";
         }
-        return this.getSquare(xPosition, yPosition);
     }
 
     openDoorBetweenSquares(squareMax: Square, squareMin: Square): void {
+        if(squareMin === squareMax) {
+            throw "Impossible d'ouvrir la porte, entre une même case! Revois ton code ;)";
+        }
         if(squareMin.position > squareMax.position) {
             let squareTemp = squareMax;
             squareMax = squareMin;
@@ -100,11 +107,13 @@ export default class MazeGrid {
                 squareMin.isTreated = true;
                 squareMax.isTreated = true;
                 break;
-            case this.mazeWidth:
+            case this.mazeHeight:
                 squareMin.rightDoor.open();
                 squareMin.isTreated = true;
                 squareMax.isTreated = true;
                 break;
+            default:
+                throw `Impossible d'ouvrir la porte, les cases n°${squareMin.position} et n°${squareMax.position} ne sont pas adjacentes`;
         }
     }
 

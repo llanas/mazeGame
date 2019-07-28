@@ -2,24 +2,60 @@ import Square from "./square";
 import MazeGrid from "./maze-grid";
 import Door from "./door";
 
+class Node {
+    partOf: number[] = [];
+    endPath: number = null;
+}
+
 export default class TreeNode {
 
     listPaths: Square[][] = [];
-    numberMap: Map<number, number[]>;
+    numberMap: Map<number, Node>;
 
-    constructor(mazeGrid: MazeGrid, squareA: Square, squareB?: Square) {
-        this.initNumberMap(mazeGrid);
-        let squareADoorsOpen = squareA.getDoorsOpen();
-        console.log(`La case n° ${squareA.position} a ${squareADoorsOpen.length} porte(s) ouverte(s)`);
-        for (let i = 0; i < squareADoorsOpen.length; i++) {
-            this.getPathFromSquare(mazeGrid, squareA, [squareADoorsOpen[i]]);
+    constructor(mazeGrid: MazeGrid, squareA: Square) {
+        if(mazeGrid.isFullyGenerated) {
+            this.initNumberMap(mazeGrid);
+            let squareADoorsOpen = squareA.getDoorsOpen();
+            for (let i = 0; i < squareADoorsOpen.length; i++) {
+                this.getPathFromSquare(mazeGrid, squareA, [squareADoorsOpen[i]]);
+            }
+        } else {
+            throw "Le labyrinthe n'est pas entièrement généré";
         }
     }
 
     initNumberMap(mazeGrid: MazeGrid) {
         this.numberMap = new Map();
         for (let i = 0; i < mazeGrid.listSquares.length; i++) {
-            this.numberMap.set(mazeGrid.listSquares[i].position, []);
+            this.numberMap.set(mazeGrid.listSquares[i].position, new Node());
+        }
+    }
+
+    getPathToSquare(square: Square): Square[] {
+        let path: Square[] = [square]
+        let squareIterator = square;
+
+        while(true) {
+            let squareNode: Node = this.numberMap.get(squareIterator.position);
+            let pathIterator: Square[] = [];
+            if(squareNode.endPath != null) {
+                pathIterator = this.listPaths[squareNode.endPath];
+                pathIterator.pop();
+            } else if(squareNode.partOf.length === 1) {
+                pathIterator = this.listPaths[squareNode.partOf[0]];
+                if(squareIterator !== square) {
+                    pathIterator.splice(pathIterator.indexOf(squareIterator) - 1);
+                } else {
+                    pathIterator.splice(pathIterator.indexOf(squareIterator));   
+                }
+            }
+            pathIterator.push(...path);
+            path = pathIterator;
+            squareIterator = path[0];
+
+            if(squareIterator.position === 0) {
+                return path;
+            }
         }
     }
     
@@ -27,36 +63,32 @@ export default class TreeNode {
         // Initialisation
         let path: Square[] = [];
         this.listPaths.push(path);
-
+        
         let squareIterator = square;
         let doorsToTreat = _doorsToTreat;
+        let actualPath = this.listPaths.length - 1;
         
         while(true) {
             
             // Setteur
-            console.log(`Traitement de la case n°${squareIterator.position}`);
-            this.numberMap.get(squareIterator.position).push(this.listPaths.length - 1);
             path.push(squareIterator);
             switch(doorsToTreat.length) {
                 case 0: // Cul de sac
-                    console.log(`On est dans un cul de sac`);
+                    this.numberMap.get(squareIterator.position).endPath = actualPath;
                     return;
                 case 1: // aller
-                    console.log(`Une seule porte disponible`);
+                    this.numberMap.get(squareIterator.position).partOf.push(actualPath);
                     squareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[0]);
                     let doorsComeBy = doorsToTreat[0];
                     doorsToTreat = squareIterator.getDoorsOpen();
                     doorsToTreat.splice(doorsToTreat.indexOf(doorsComeBy), 1);
                     break;
                 default: // node
-                    console.log(`On est dans une intersection où il reste ${doorsToTreat.length} directions possibles`);
                     for (let i = 0; i < doorsToTreat.length; i++) {
-                        let nextSquareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[i]);
-                        let newDoorsToTreat = nextSquareIterator.getDoorsOpen();
-                        newDoorsToTreat.splice(newDoorsToTreat.indexOf(doorsToTreat[i]), 1);
-                        this.getPathFromSquare(mazeGrid, nextSquareIterator, newDoorsToTreat);
+                        this.getPathFromSquare(mazeGrid, squareIterator, [doorsToTreat[i]]);
                     }
-                    break;
+                    this.numberMap.get(squareIterator.position).endPath = actualPath;
+                    return;
             }
         }
     }

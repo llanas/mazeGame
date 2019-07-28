@@ -9,6 +9,7 @@ export default class BombMazeGenerator implements IMazeGenerator {
     isGenerationOver: boolean;
     mazeGrid: MazeGrid;
 
+    listSquareNumberZero = 1;
     listDoorsAvailable: Door[];
 
     constructor(_mazeGrid: MazeGrid) {
@@ -27,21 +28,28 @@ export default class BombMazeGenerator implements IMazeGenerator {
             this.mazeGrid.getSquare(doorInProgress.x, doorInProgress.y - 1);
 
         let squareMax = this.mazeGrid.getSquare(doorInProgress.x, doorInProgress.y);
-    
-        if(squareMin.number < squareMax.number) {
+
+        let minNumber = Math.min(squareMin.number, squareMax.number);
+        let maxNumber = Math.max(squareMin.number, squareMax.number);
+        
+        if(minNumber != maxNumber) {
+            for (let i = 0; i < this.mazeGrid.listSquares.length; i++) {
+                const square = this.mazeGrid.listSquares[i];
+                if(square.number === maxNumber) {
+                    square.number = minNumber;
+                    if(minNumber === 0) this.listSquareNumberZero++;
+                }
+            }
+            
             squareMin.isTreated = true;
-            this.mazeGrid.listSquares.filter(square => square.number === squareMax.number).forEach(square => square.number = squareMin.number);
-            squareMax.isTreated = true;
-            doorInProgress.open();
-        } else if(squareMin.number > squareMax.number) {
-            squareMin.isTreated = true;
-            this.mazeGrid.listSquares.filter(square => square.number === squareMin.number).forEach(square => square.number = squareMax.number);
             squareMax.isTreated = true;
             doorInProgress.open();
         }
+
         this.listDoorsAvailable.splice(rand, 1);
-        if(this.mazeGrid.listSquares.filter(square => square.number != 0).length == 0) {
-            this.isGenerationOver = true;
+        
+        if(this.listSquareNumberZero === this.mazeGrid.listSquares.length) {
+            this.mazeGrid.isFullyGenerated = true;
         }
     }
 }

@@ -25,6 +25,7 @@ const utils_1 = __importDefault(__webpack_require__(/*! ../../utils/utils */ "./
 
 class BombMazeGenerator {
   constructor(_mazeGrid) {
+    this.listSquareNumberZero = 1;
     this.mazeGrid = _mazeGrid;
     this.isGenerationOver = false;
     this.listDoorsAvailable = _mazeGrid.listDoors.filter(door => door.isOpenable);
@@ -35,23 +36,28 @@ class BombMazeGenerator {
     let doorInProgress = this.listDoorsAvailable[rand];
     let squareMin = doorInProgress.isVertical ? this.mazeGrid.getSquare(doorInProgress.x - 1, doorInProgress.y) : this.mazeGrid.getSquare(doorInProgress.x, doorInProgress.y - 1);
     let squareMax = this.mazeGrid.getSquare(doorInProgress.x, doorInProgress.y);
+    let minNumber = Math.min(squareMin.number, squareMax.number);
+    let maxNumber = Math.max(squareMin.number, squareMax.number);
 
-    if (squareMin.number < squareMax.number) {
+    if (minNumber != maxNumber) {
+      for (let i = 0; i < this.mazeGrid.listSquares.length; i++) {
+        const square = this.mazeGrid.listSquares[i];
+
+        if (square.number === maxNumber) {
+          square.number = minNumber;
+          if (minNumber === 0) this.listSquareNumberZero++;
+        }
+      }
+
       squareMin.isTreated = true;
-      this.mazeGrid.listSquares.filter(square => square.number === squareMax.number).forEach(square => square.number = squareMin.number);
-      squareMax.isTreated = true;
-      doorInProgress.open();
-    } else if (squareMin.number > squareMax.number) {
-      squareMin.isTreated = true;
-      this.mazeGrid.listSquares.filter(square => square.number === squareMin.number).forEach(square => square.number = squareMax.number);
       squareMax.isTreated = true;
       doorInProgress.open();
     }
 
     this.listDoorsAvailable.splice(rand, 1);
 
-    if (this.mazeGrid.listSquares.filter(square => square.number != 0).length == 0) {
-      this.isGenerationOver = true;
+    if (this.listSquareNumberZero === this.mazeGrid.listSquares.length) {
+      this.mazeGrid.isFullyGenerated = true;
     }
   }
 
@@ -101,26 +107,14 @@ class BuildMazeGenerator {
     }
 
     let neighboursAvailable = [];
-
-    if (squareInProgress.topDoor.isOpenable) {
-      let topSquare = this.mazeGrid.getSquareByPosition(squareInProgress.position - 1);
-      if (!topSquare.isTreated) neighboursAvailable.push(topSquare);
-    }
-
-    if (squareInProgress.rightDoor.isOpenable) {
-      let rightSquare = this.mazeGrid.getSquareByPosition(squareInProgress.position + this.mazeGrid.mazeHeight);
-      if (!rightSquare.isTreated) neighboursAvailable.push(rightSquare);
-    }
-
-    if (squareInProgress.bottomDoor.isOpenable) {
-      let bottomSquare = this.mazeGrid.getSquareByPosition(squareInProgress.position + 1);
-      if (!bottomSquare.isTreated) neighboursAvailable.push(bottomSquare);
-    }
-
-    if (squareInProgress.leftDoor.isOpenable) {
-      let leftSquare = this.mazeGrid.getSquareByPosition(squareInProgress.position - this.mazeGrid.mazeWidth);
-      if (!leftSquare.isTreated) neighboursAvailable.push(leftSquare);
-    }
+    let topSquare = this.testDoor(squareInProgress, squareInProgress.topDoor);
+    if (topSquare != null && !topSquare.isTreated) neighboursAvailable.push(topSquare);
+    let rightSquare = this.testDoor(squareInProgress, squareInProgress.rightDoor);
+    if (rightSquare != null && !rightSquare.isTreated) neighboursAvailable.push(rightSquare);
+    let bottomSquare = this.testDoor(squareInProgress, squareInProgress.bottomDoor);
+    if (bottomSquare != null && !bottomSquare.isTreated) neighboursAvailable.push(bottomSquare);
+    let leftSquare = this.testDoor(squareInProgress, squareInProgress.leftDoor);
+    if (leftSquare != null && !leftSquare.isTreated) neighboursAvailable.push(leftSquare);
 
     if (neighboursAvailable.length !== 0) {
       let nextSquareToTreat = neighboursAvailable[utils_1.default.getRandomInt(neighboursAvailable.length)];
@@ -133,8 +127,18 @@ class BuildMazeGenerator {
     }
 
     if (this.squareTreatedPool.length === 0) {
-      this.isGenerationOver = true;
+      this.mazeGrid.isFullyGenerated = true;
     }
+  }
+
+  testDoor(square, door) {
+    let nextSquare = null;
+
+    if (door.isOpenable && !door.isOpen) {
+      nextSquare = this.mazeGrid.getSquareByDoor(square, door);
+    }
+
+    return nextSquare;
   }
 
 }
@@ -199,18 +203,21 @@ exports.initMaze = initMaze;
 
 function process() {
   if (maze != null) {
-    if (mazeGenAlgo.isGenerationOver) {
+    if (maze.isFullyGenerated) {
       maze.resetMaze();
       mazeGenAlgo = _getMazeGenAlgo();
     }
 
     console.time("mazeGen");
 
-    while (!mazeGenAlgo.isGenerationOver) {
-      mazeGenAlgo.step();
+    try {
+      while (!maze.isFullyGenerated) {
+        mazeGenAlgo.step();
+      }
+    } finally {
+      console.timeEnd("mazeGen");
     }
 
-    console.timeEnd("mazeGen");
     drawer.drawMaze(maze);
   }
 }
@@ -231,8 +238,16 @@ function step() {
 exports.step = step;
 
 function solution() {
-  let treeNode = new treeNode_1.default(maze, maze.getSquareByPosition(0), maze.listSquares[maze.listSquares.length - 1]);
-  console.dir(treeNode);
+  console.time("mazeSolution");
+  let treeNode = new treeNode_1.default(maze, maze.getSquareByPosition(0));
+  let solutionPath = treeNode.getPathToSquare(maze.listSquares[maze.listSquares.length - 1]);
+  console.timeEnd("mazeSolution");
+
+  for (let i = 0; i < solutionPath.length; i++) {
+    solutionPath[i].isInSolutionPath = true;
+  }
+
+  drawer.drawMaze(maze);
 }
 
 exports.solution = solution;
@@ -315,9 +330,9 @@ const door_1 = __importDefault(__webpack_require__(/*! ./door */ "./src/model/do
 class MazeGrid {
   constructor(_mazeWidth, _mazeHeight) {
     this.grid = [];
+    this.isFullyGenerated = false;
     this.listSquares = [];
     this.listDoors = [];
-    this.treeNode = null;
     this.mazeWidth = _mazeWidth;
     this.mazeHeight = _mazeHeight;
     this.generateGrid();
@@ -328,6 +343,7 @@ class MazeGrid {
     this.listSquares = [];
     this.listDoors = [];
     this.grid = [];
+    this.isFullyGenerated = false;
     this.generateGrid();
     this.generateDoors();
   }
@@ -375,25 +391,33 @@ class MazeGrid {
   }
 
   getSquareByPosition(position) {
-    return this.grid[Math.floor(position / this.mazeWidth)][position % this.mazeHeight];
+    return this.listSquares[position]; // return this.grid[Math.round(position / (this.mazeWidth / this.mazeHeight))][(position % this.mazeHeight) - 1];
   }
 
   getSquareByDoor(basedSquare, door) {
     let xPosition;
     let yPosition;
 
-    if (door.isVertical) {
-      xPosition = door.x === basedSquare.x ? door.x - 1 : door.x;
-      yPosition = door.y;
-    } else {
-      xPosition = door.x;
-      yPosition = door.y === basedSquare.y ? door.y - 1 : door.y;
-    }
+    if (door.isOpenable) {
+      if (door.isVertical) {
+        xPosition = door.x === basedSquare.x ? door.x - 1 : door.x;
+        yPosition = door.y;
+      } else {
+        xPosition = door.x;
+        yPosition = door.y === basedSquare.y ? door.y - 1 : door.y;
+      }
 
-    return this.getSquare(xPosition, yPosition);
+      return this.getSquare(xPosition, yPosition);
+    } else {
+      throw "La porte n'est pas ouvrable";
+    }
   }
 
   openDoorBetweenSquares(squareMax, squareMin) {
+    if (squareMin === squareMax) {
+      throw "Impossible d'ouvrir la porte, entre une même case! Revois ton code ;)";
+    }
+
     if (squareMin.position > squareMax.position) {
       let squareTemp = squareMax;
       squareMax = squareMin;
@@ -407,11 +431,14 @@ class MazeGrid {
         squareMax.isTreated = true;
         break;
 
-      case this.mazeWidth:
+      case this.mazeHeight:
         squareMin.rightDoor.open();
         squareMin.isTreated = true;
         squareMax.isTreated = true;
         break;
+
+      default:
+        throw `Impossible d'ouvrir la porte, les cases n°${squareMin.position} et n°${squareMax.position} ne sont pas adjacentes`;
     }
   }
 
@@ -495,15 +522,27 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-class TreeNode {
-  constructor(mazeGrid, squareA, squareB) {
-    this.listPaths = [];
-    this.initNumberMap(mazeGrid);
-    let squareADoorsOpen = squareA.getDoorsOpen();
-    console.log(`La case n° ${squareA.position} a ${squareADoorsOpen.length} porte(s) ouverte(s)`);
+class Node {
+  constructor() {
+    this.partOf = [];
+    this.endPath = null;
+  }
 
-    for (let i = 0; i < squareADoorsOpen.length; i++) {
-      this.getPathFromSquare(mazeGrid, squareA, [squareADoorsOpen[i]]);
+}
+
+class TreeNode {
+  constructor(mazeGrid, squareA) {
+    this.listPaths = [];
+
+    if (mazeGrid.isFullyGenerated) {
+      this.initNumberMap(mazeGrid);
+      let squareADoorsOpen = squareA.getDoorsOpen();
+
+      for (let i = 0; i < squareADoorsOpen.length; i++) {
+        this.getPathFromSquare(mazeGrid, squareA, [squareADoorsOpen[i]]);
+      }
+    } else {
+      throw "Le labyrinthe n'est pas entièrement généré";
     }
   }
 
@@ -511,7 +550,38 @@ class TreeNode {
     this.numberMap = new Map();
 
     for (let i = 0; i < mazeGrid.listSquares.length; i++) {
-      this.numberMap.set(mazeGrid.listSquares[i].position, []);
+      this.numberMap.set(mazeGrid.listSquares[i].position, new Node());
+    }
+  }
+
+  getPathToSquare(square) {
+    let path = [square];
+    let squareIterator = square;
+
+    while (true) {
+      let squareNode = this.numberMap.get(squareIterator.position);
+      let pathIterator = [];
+
+      if (squareNode.endPath != null) {
+        pathIterator = this.listPaths[squareNode.endPath];
+        pathIterator.pop();
+      } else if (squareNode.partOf.length === 1) {
+        pathIterator = this.listPaths[squareNode.partOf[0]];
+
+        if (squareIterator !== square) {
+          pathIterator.splice(pathIterator.indexOf(squareIterator) - 1);
+        } else {
+          pathIterator.splice(pathIterator.indexOf(squareIterator));
+        }
+      }
+
+      pathIterator.push(...path);
+      path = pathIterator;
+      squareIterator = path[0];
+
+      if (squareIterator.position === 0) {
+        return path;
+      }
     }
   }
 
@@ -521,22 +591,21 @@ class TreeNode {
     this.listPaths.push(path);
     let squareIterator = square;
     let doorsToTreat = _doorsToTreat;
+    let actualPath = this.listPaths.length - 1;
 
     while (true) {
       // Setteur
-      console.log(`Traitement de la case n°${squareIterator.position}`);
-      this.numberMap.get(squareIterator.position).push(this.listPaths.length - 1);
       path.push(squareIterator);
 
       switch (doorsToTreat.length) {
         case 0:
           // Cul de sac
-          console.log(`On est dans un cul de sac`);
+          this.numberMap.get(squareIterator.position).endPath = actualPath;
           return;
 
         case 1:
           // aller
-          console.log(`Une seule porte disponible`);
+          this.numberMap.get(squareIterator.position).partOf.push(actualPath);
           squareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[0]);
           let doorsComeBy = doorsToTreat[0];
           doorsToTreat = squareIterator.getDoorsOpen();
@@ -545,16 +614,12 @@ class TreeNode {
 
         default:
           // node
-          console.log(`On est dans une intersection où il reste ${doorsToTreat.length} directions possibles`);
-
           for (let i = 0; i < doorsToTreat.length; i++) {
-            let nextSquareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[i]);
-            let newDoorsToTreat = nextSquareIterator.getDoorsOpen();
-            newDoorsToTreat.splice(newDoorsToTreat.indexOf(doorsToTreat[i]), 1);
-            this.getPathFromSquare(mazeGrid, nextSquareIterator, newDoorsToTreat);
+            this.getPathFromSquare(mazeGrid, squareIterator, [doorsToTreat[i]]);
           }
 
-          break;
+          this.numberMap.get(squareIterator.position).endPath = actualPath;
+          return;
       }
     }
   }

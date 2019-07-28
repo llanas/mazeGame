@@ -26,15 +26,18 @@ export function initMaze() {
 
 export function process() {
     if(maze != null) {
-        if(mazeGenAlgo.isGenerationOver) {
+        if(maze.isFullyGenerated) {
             maze.resetMaze();
             mazeGenAlgo = _getMazeGenAlgo();
         }
         console.time("mazeGen");
-        while(!mazeGenAlgo.isGenerationOver) {
-            mazeGenAlgo.step();
+        try {
+            while(!maze.isFullyGenerated) {
+                mazeGenAlgo.step();
+            }
+        } finally {
+            console.timeEnd("mazeGen");
         }
-        console.timeEnd("mazeGen");
         drawer.drawMaze(maze);
     }
 }
@@ -51,8 +54,14 @@ export function step() {
 }
 
 export function solution() {
-    let treeNode = new TreeNode(maze, maze.getSquareByPosition(0), maze.listSquares[maze.listSquares.length - 1]);
-    console.dir(treeNode);
+    console.time("mazeSolution");
+    let treeNode = new TreeNode(maze, maze.getSquareByPosition(0));
+    let solutionPath = treeNode.getPathToSquare(maze.listSquares[maze.listSquares.length - 1]);
+    console.timeEnd("mazeSolution");
+    for (let i = 0; i < solutionPath.length; i++) {
+        solutionPath[i].isInSolutionPath = true;
+    }
+    drawer.drawMaze(maze);
 }
 
 function _getMazeGenAlgo(): IMazeGenerator {
