@@ -5,11 +5,11 @@ import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
 import TreeNode from "./model/treeNode";
 import GameController from "./controls/game-controller";
-import PhysicalEngine from "./physics/physical-engine";
 import Player from "./model/player";
-import { Direction, Position } from "./physics/utils/physical-tools";
-import PhysicalObject from "./physics/objects/physical-object";
+import { Position } from "./physics/utils/physical-tools";
+import Vector from "./physics/objects/physical-vector";
 
+export let v = Vector;
 export let maze: MazeGrid = null;
 
 let mazeGenAlgo: IMazeGenerator;
@@ -50,14 +50,16 @@ function update(timeStamp: DOMHighResTimeStamp) {
     if(gameController.leftPressed) deltaX--;
 
     if(deltaX !== 0 || deltaY !== 0) {
-        let playerDirection = Direction.buildDirectionFromPositions(Position.buildFromGridPosition(deltaX, deltaY));
-        PhysicalEngine.move(player, playerDirection, player.speed);
+        let playerMovingVector = new Vector(deltaX, deltaY);
+        player.move(playerMovingVector);
     }
+
     if(player.position.gridPosition.x === maze.mazeWidth - 1 && player.position.gridPosition.y === maze.mazeHeight - 1) {
         stop();
         alert("YOU WIN BATARD !");
         return;
     }
+
     render();
     // Rendering
     animationFrameId = window.requestAnimationFrame(update);

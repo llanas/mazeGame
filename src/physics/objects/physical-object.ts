@@ -1,4 +1,5 @@
 import { Position, Coordonate } from "../utils/physical-tools";
+import Vector from "./physical-vector";
 
 export default class PhysicalObject {
     
@@ -29,7 +30,11 @@ export default class PhysicalObject {
         let listColidingObjects = [];
         for (let x = minX; x <= maxX; x++) {
             for (let y = minY; y <= maxY; y++) {
-                listColidingObjects.push(...PhysicalObject.gridObjects[x][y]);
+                for (let i = 0; i < PhysicalObject.gridObjects[x][y].length; i++) {
+                    if(PhysicalObject.gridObjects[x][y][i].coliding) {
+                        listColidingObjects.push(PhysicalObject.gridObjects[x][y][i]);
+                    }
+                }
             }
         }
         return listColidingObjects;       
@@ -51,6 +56,11 @@ export default class PhysicalObject {
         } else if(this.coliding) {
             PhysicalObject.listColidingObjects.push(this);
             PhysicalObject.gridObjects[this.position.gridPosition.x][this.position.gridPosition.y].push(this);
+        }
+    }
+
+    move(movingVector: Vector) {
+        if(this.movable) {
         }
     }
 

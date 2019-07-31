@@ -2,8 +2,8 @@ import Door from "./door";
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 
-const squareWidth = 20;
-const squareHeight = 20;
+const squareWidth = 30;
+const squareHeight = 30;
 
 export default class Square extends PhysicalRectangle {
 

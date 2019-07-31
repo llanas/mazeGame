@@ -130,11 +130,6 @@ export default class MazeGrid {
 
     private _buildDoor(_gridX: number, _gridY: number, _isVerticale: boolean, _isOpenable: boolean): Door {
         let doorPosition = Position.buildFromGridPosition(_gridX, _gridY);
-        // if(_isVerticale) {
-        //     doorPosition.x--;
-        // } else {
-        //     doorPosition.y--;
-        // }
         let newDoor = new Door(doorPosition, _isVerticale, _isOpenable);
         this.listDoors.push(newDoor);
         return newDoor;

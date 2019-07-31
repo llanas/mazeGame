@@ -1,7 +1,7 @@
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 
-const doorLength = 20;
+const doorLength = 32;
 const doorWidth = 2;
 
 export default class Door extends PhysicalRectangle {

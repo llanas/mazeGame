@@ -1,5 +1,6 @@
 import Constants from "../../utils/constants";
 import PhysicsUtils from "./physical-utils";
+import Vector from "../objects/physical-vector";
 
 export interface Coordonate {
     x: number;
@@ -29,6 +30,12 @@ export class Position implements Coordonate {
         } else {
             this._gridPosition = {x: Math.floor(this.x / Constants.gridSquareSize), y: Math.floor(this.y / Constants.gridSquareSize)};
         }
+    }
+
+    move(movingVector: Vector) {
+        this.x += movingVector.x;
+        this.y += movingVector.y;
+        this._gridPosition = {x: Math.floor(this.x / Constants.gridSquareSize), y: Math.floor(this.y / Constants.gridSquareSize)};
     }
 
     getNewPositionAfterMove(direction: Direction, speed: number) {
@@ -71,17 +78,4 @@ export class Direction {
         return this._angle;
     }
 
-}
-
-export class Vector {
-
-    deltaX: number;
-    deltaY: number;
-    angle: number;
-
-    constructor(_deltaX: number, _deltaY: number, _angle: number) {
-        this.deltaX = _deltaX;
-        this.deltaY = _deltaY;
-        this.angle = _angle;
-    }
 }

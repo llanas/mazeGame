@@ -3,7 +3,7 @@ import Square from "../model/square";
 import Door from "../model/door";
 import Player from "../model/player";
 
-const squareSize = 20;
+const squareSize = 30;
 
 export default class Drawer {
 
@@ -57,12 +57,7 @@ export default class Drawer {
     drawDoor(_door: Door): void {
         if (!_door.isOpen) {
             this.context.fillStyle = 'rgb(0,0,0)';
-            if (_door.isVertical) {
-                this.context.fillRect(_door.position.x - 1, _door.position.y, 1, squareSize);
-            }
-            else {
-                this.context.fillRect(_door.position.x, _door.position.y - 1, squareSize, 1);
-            }
+            this.context.fillRect(_door.position.x, _door.position.y, _door.width, _door.height);
         }
     }
 }
