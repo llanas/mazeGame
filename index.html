@@ -20,6 +20,11 @@
                 <label for="mapHeight" class="inputLabel">Map Height</label>
                 <input type="number" name="mapHeight" id="mapHeight" value="20" />
             </div><br/>
+            <div>
+                <label>Frame Id</label>
+                <input type="text" name="animationFrameId" id="animationFrameId" />
+
+            </div>
             <div class="inputGroup">
                 <div>
                     <input type="radio" id="buildAlgoInput" name="algoInput" value="build" checked>
@@ -35,6 +40,10 @@
                 <input type="button" onclick="index.process()" value="Generer" />
                 <input type="button" onclick="index.step()" value="Step" />
                 <input type="button" onclick="index.solution()" value="solution">
+            </div><br/>
+            <div class="actions">
+                <input type="button" onclick="index.start()" value="Start" />
+                <input type="button" onclick="index.stop()" value="Stop" />
             </div>
             <div id="console">
                 

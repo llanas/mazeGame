@@ -27,7 +27,7 @@ export default class TreeNode {
     initNumberMap(mazeGrid: MazeGrid) {
         this.numberMap = new Map();
         for (let i = 0; i < mazeGrid.listSquares.length; i++) {
-            this.numberMap.set(mazeGrid.listSquares[i].position, new Node());
+            this.numberMap.set(mazeGrid.listSquares[i].number, new Node());
         }
     }
 
@@ -36,7 +36,7 @@ export default class TreeNode {
         let squareIterator = square;
 
         while(true) {
-            let squareNode: Node = this.numberMap.get(squareIterator.position);
+            let squareNode: Node = this.numberMap.get(squareIterator.number);
             let pathIterator: Square[] = [];
             if(squareNode.endPath != null) {
                 pathIterator = this.listPaths[squareNode.endPath];
@@ -53,7 +53,7 @@ export default class TreeNode {
             path = pathIterator;
             squareIterator = path[0];
 
-            if(squareIterator.position === 0) {
+            if(squareIterator.number === 0) {
                 return path;
             }
         }
@@ -74,10 +74,10 @@ export default class TreeNode {
             path.push(squareIterator);
             switch(doorsToTreat.length) {
                 case 0: // Cul de sac
-                    this.numberMap.get(squareIterator.position).endPath = actualPath;
+                    this.numberMap.get(squareIterator.number).endPath = actualPath;
                     return;
                 case 1: // aller
-                    this.numberMap.get(squareIterator.position).partOf.push(actualPath);
+                    this.numberMap.get(squareIterator.number).partOf.push(actualPath);
                     squareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[0]);
                     let doorsComeBy = doorsToTreat[0];
                     doorsToTreat = squareIterator.getDoorsOpen();
@@ -87,7 +87,7 @@ export default class TreeNode {
                     for (let i = 0; i < doorsToTreat.length; i++) {
                         this.getPathFromSquare(mazeGrid, squareIterator, [doorsToTreat[i]]);
                     }
-                    this.numberMap.get(squareIterator.position).endPath = actualPath;
+                    this.numberMap.get(squareIterator.number).endPath = actualPath;
                     return;
             }
         }

@@ -4,10 +4,24 @@ import IMazeGenerator from "./algo/mazegen/mazegen-interface";
 import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
 import TreeNode from "./model/treeNode";
+import GameController from "./controls/game-controller";
+import PhysicalEngine from "./physics/physical-engine";
+import Player from "./model/player";
+import { Direction, Position } from "./physics/utils/physical-tools";
+
+const framePerSeconds = 32;
+let squareSizes = 20;
 
 let maze: MazeGrid = null;
 let mazeGenAlgo: IMazeGenerator;
 let drawer: Drawer = null;
+
+let player: Player = null;
+
+
+// GAME CONTROLLER
+let gameController: GameController = null;
+let animationFrameId: number = null;
 
 export function init() {
     initMaze();
@@ -16,6 +30,53 @@ export function init() {
     drawer.drawMaze(maze);
     drawer.display();
 }
+
+export function start() {
+    if(animationFrameId == null) {
+        gameController = new GameController();
+        player = new Player(10, 10);
+        render();
+        animationFrameId = window.requestAnimationFrame(update);
+    }
+}
+
+function update(timeStamp: DOMHighResTimeStamp) {
+    updateFrameId(animationFrameId);
+    let deltaX = 0;
+    let deltaY = 0;
+    if(gameController.upPressed) deltaY--;
+    if(gameController.rightPressed) deltaX++; 
+    if(gameController.downPressed) deltaY++;
+    if(gameController.leftPressed) deltaX--;
+
+    if(deltaX !== 0 || deltaY !== 0) {
+        let playerDirection = Direction.buildDirectionFromPositions(new Position(deltaX, deltaY));
+        PhysicalEngine.move(player, playerDirection, player.speed);
+    }
+    render();
+    // Rendering
+    animationFrameId = window.requestAnimationFrame(update);
+}
+
+export function stop() {
+    window.cancelAnimationFrame(animationFrameId);
+    gameController = null;
+    player = null;
+    animationFrameId = null;
+    updateFrameId(animationFrameId);
+}
+
+function updateFrameId(frameId: number | null) {
+    let frameIdInput = <HTMLInputElement> document.getElementById("animationFrameId")
+    frameIdInput.value = "" + frameId;
+}
+
+function render() {
+    drawer.clear();
+    drawer.drawMaze(maze);
+    drawer.drawPlayer(player);
+}
+
 
 export function initMaze() {
     let _mapWidthInput = <HTMLInputElement> document.getElementById("mapWidth");

@@ -1,16 +1,16 @@
 import Door from "./door";
-import { PhysicalRectangle } from "./physics/physical-objects-interfaces";
+import { Position } from "../physics/utils/physical-tools";
+import PhysicalRectangle from "../physics/objects/physical-rectangle";
 
-export default class Square implements PhysicalRectangle {
-    
+const squareWidth = 20;
+const squareHeight = 20;
+
+export default class Square extends PhysicalRectangle {
+
     public static listSquares: Square[] = [];
 
-    width = 20;
-    height = 20;
-    x: number;
-    y: number;
-    
-    position: number;
+    position: Position;
+    mazePosition: Position;
     number: number;
     isTreated: boolean;
     isInSolutionPath: boolean;
@@ -21,10 +21,11 @@ export default class Square implements PhysicalRectangle {
     leftDoor: Door;
 
     constructor(_number: number, _mapX: number, _mapY: number) {
-        this.position = _number;
+        let squarePosition = new Position(_mapX * squareWidth, _mapY * squareHeight);
+        super(squarePosition, false, false, squareWidth, squareHeight);
+        
+        this.mazePosition = new Position(_mapX, _mapY);
         this.number = _number;
-        this.x = _mapX;
-        this.y = _mapY;
         this.isTreated = false;
         
         Square.listSquares.push(this);

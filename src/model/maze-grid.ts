@@ -44,20 +44,20 @@ export default class MazeGrid {
         for (let i = 0; i < this.listSquares.length; i++) {
             const square = this.listSquares[i];
 
-            if(square.y !== 0) {
-                square.topDoor = this.getSquareByPosition(square.position - 1).bottomDoor;
+            if(square.position.y !== 0) {
+                square.topDoor = this.getSquareByPosition(square.number - 1).bottomDoor;
             } else {
-                square.topDoor = this._buildDoor(square.x, square.y, false, false);
+                square.topDoor = this._buildDoor(square.position.x, square.position.y, false, false);
             }
 
-            if(square.x !== 0) {
-                square.leftDoor = this.getSquareByPosition(square.position - this.mazeHeight).rightDoor;
+            if(square.position.x !== 0) {
+                square.leftDoor = this.getSquareByPosition(square.number - this.mazeHeight).rightDoor;
             } else {
-                square.leftDoor = this._buildDoor(square.x, square.y, true, false);
+                square.leftDoor = this._buildDoor(square.position.x, square.position.y, true, false);
             }
 
-            square.rightDoor = this._buildDoor(square.x + 1, square.y, true, square.x !== this.mazeWidth - 1);
-            square.bottomDoor = this._buildDoor(square.x, square.y + 1, false, square.y !== this.mazeHeight - 1);
+            square.rightDoor = this._buildDoor(square.position.x + 1, square.position.y, true, square.position.x !== this.mazeWidth - 1);
+            square.bottomDoor = this._buildDoor(square.position.x, square.position.y + 1, false, square.position.y !== this.mazeHeight - 1);
         }
     }
 
@@ -79,11 +79,11 @@ export default class MazeGrid {
         let yPosition;
         if(door.isOpenable) {
             if(door.isVertical) {
-                xPosition = (door.x === basedSquare.x) ? door.x - 1 : door.x;
-                yPosition = door.y;
+                xPosition = (door.position.x === basedSquare.position.x) ? door.position.x - 1 : door.position.x;
+                yPosition = door.position.y;
             } else {
-                xPosition = door.x;
-                yPosition = (door.y === basedSquare.y) ? door.y - 1 : door.y
+                xPosition = door.position.x;
+                yPosition = (door.position.y === basedSquare.position.y) ? door.position.y - 1 : door.position.y;
             }
             return this.getSquare(xPosition, yPosition);
         } else {
@@ -95,13 +95,13 @@ export default class MazeGrid {
         if(squareMin === squareMax) {
             throw "Impossible d'ouvrir la porte, entre une même case! Revois ton code ;)";
         }
-        if(squareMin.position > squareMax.position) {
+        if(squareMin.number > squareMax.number) {
             let squareTemp = squareMax;
             squareMax = squareMin;
             squareMin = squareTemp;
         }
 
-        switch(squareMax.position - squareMin.position) {
+        switch(squareMax.number - squareMin.number) {
             case 1: 
                 squareMin.bottomDoor.open();
                 squareMin.isTreated = true;

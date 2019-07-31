@@ -1,6 +1,7 @@
 import MazeGrid from "../model/maze-grid";
 import Square from "../model/square";
 import Door from "../model/door";
+import Player from "../model/player";
 
 const squareSize = 20;
 
@@ -22,11 +23,14 @@ export default class Drawer {
         this.canvas.hidden = false;
     }
 
+    clear() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
     drawMaze(_mazeGrid: MazeGrid): void {
         if(_mazeGrid != null && _mazeGrid.grid.length != 0) {
             this.canvas.width = _mazeGrid.mazeWidth * squareSize;
             this.canvas.height = _mazeGrid.mazeHeight * squareSize;
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
             for (let x = 0; x < _mazeGrid.mazeWidth; x++) {
                 for (let y = 0; y < _mazeGrid.mazeHeight; y++) {
                     this.drawSquare(_mazeGrid.grid[x][y]);
@@ -38,19 +42,26 @@ export default class Drawer {
         }
     }
 
+    drawPlayer(player: Player): void {
+        this.context.fillStyle = 'rgb(60, 200, 75)';
+        this.context.beginPath();
+        this.context.arc(player.position.x, player.position.y, player.radius, 0, 2 * Math.PI);
+        this.context.fill();
+    }
+
     drawSquare(_square: Square): void {
         this.context.fillStyle = _square.getColor();
-        this.context.fillRect(_square.x * squareSize, _square.y * squareSize, squareSize, squareSize);
+        this.context.fillRect(_square.position.x * squareSize, _square.position.y * squareSize, squareSize, squareSize);
     }
 
     drawDoor(_door: Door): void {
         if (!_door.isOpen) {
             this.context.fillStyle = 'rgb(0,0,0)';
             if (_door.isVertical) {
-                this.context.fillRect((_door.x * squareSize) - 1, _door.y * squareSize, 1, squareSize);
+                this.context.fillRect((_door.position.x * squareSize) - 1, _door.position.y * squareSize, 1, squareSize);
             }
             else {
-                this.context.fillRect(_door.x * squareSize, (_door.y * squareSize) - 1, squareSize, 1);
+                this.context.fillRect(_door.position.x * squareSize, (_door.position.y * squareSize) - 1, squareSize, 1);
             }
         }
     }
