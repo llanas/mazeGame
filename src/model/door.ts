@@ -1,7 +1,7 @@
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 
-const doorLength = 32;
+const doorLength = 30;
 const doorWidth = 2;
 
 export default class Door extends PhysicalRectangle {
@@ -14,6 +14,11 @@ export default class Door extends PhysicalRectangle {
     isVertical: boolean;
 
     constructor(_position: Position, _isVertical: boolean, _isOpenable: boolean) {
+        if(_isVertical) {
+            _position.x--;
+        } else {
+            _position.y--;
+        }
         super(_position, false, true, (_isVertical) ? doorWidth : doorLength, (_isVertical) ? doorLength : doorWidth);
 
         this.isOpenable = _isOpenable;

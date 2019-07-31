@@ -36,7 +36,7 @@ export default class PhysicalRectangle extends PhysicalObject {
         return isColliding;
     }
 
-    getVectorAfterSlide(position: Position, movingVector: Vector): Vector {
+    getVectorAfterSlide(position: Position, radius: number, movingVector: Vector): Vector {
 
         let minX = Math.min(this.position.x, this.position.x + this.width);
         let maxX = Math.max(this.position.x, this.position.x + this.width);
@@ -52,6 +52,8 @@ export default class PhysicalRectangle extends PhysicalObject {
         if(maxX < newX) side += 2; // Si right
         if(maxY < newY) side += 4; // Si bottom
         if(minX > newX) side += 8; // Si left
+
+        let movingAngle = movingVector.angleDeg();
 
         switch(side) {
             case 0:
@@ -69,19 +71,23 @@ export default class PhysicalRectangle extends PhysicalObject {
                 movingVector.x = 0;
                 break;
             case 3: // TOP-RIGHT
-                if(movingVector.angleDeg() < -45) movingVector.x = 0;
+                if(movingAngle === -45) movingVector.x++;
+                else if(movingAngle < -45) movingVector.x;
                 else movingVector.y = 0;
                 break;
             case 6: // RIGHT-BOTTOM
-                if(movingVector.angleDeg() > 45) movingVector.x = 0;
+                if(movingAngle === 45) movingVector.x++;
+                else if(movingAngle > 45) movingVector.x = 0;
                 else movingVector.y = 0;
                 break;
             case 12: // BOTTOM-LEFT
-                if(movingVector.angleDeg() < 135) movingVector.x = 0;
+                if(movingAngle === 135) movingVector.x--;
+                if(movingAngle < 135) movingVector.x = 0;
                 else movingVector.y = 0;
                 break;
             case 9: // LEFT-TOP
-                if(movingVector.angleDeg() > -135) movingVector.x = 0;
+                if(movingAngle === -135) movingVector.x--;
+                if(movingAngle > -135) movingVector.x = 0;
                 else movingVector.y = 0;
                 break;
         }

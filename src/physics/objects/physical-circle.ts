@@ -20,7 +20,7 @@ export default class PhysicalCircle extends PhysicalObject {
             if(this.checkCollision(objectColidingWith, movingVector)) {
                 if(this.sliding) {
                     if(objectColidingWith instanceof PhysicalRectangle) {
-                        movingVector = objectColidingWith.getVectorAfterSlide(this.position, movingVector);
+                        movingVector = objectColidingWith.getVectorAfterSlide(this.position, this.radius, movingVector);
                         if(movingVector.isZero()) return;
                     }
                 }

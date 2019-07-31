@@ -29,8 +29,8 @@ export default class Drawer {
 
     drawMaze(_mazeGrid: MazeGrid): void {
         if(_mazeGrid != null && _mazeGrid.grid.length != 0) {
-            this.canvas.width = _mazeGrid.mazeWidth * squareSize;
-            this.canvas.height = _mazeGrid.mazeHeight * squareSize;
+            this.canvas.width = (_mazeGrid.mazeWidth * squareSize);
+            this.canvas.height = (_mazeGrid.mazeHeight * squareSize);
             for (let x = 0; x < _mazeGrid.mazeWidth; x++) {
                 for (let y = 0; y < _mazeGrid.mazeHeight; y++) {
                     this.drawSquare(_mazeGrid.grid[x][y]);
