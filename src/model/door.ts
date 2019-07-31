@@ -15,7 +15,7 @@ export default class Door extends PhysicalRectangle {
     isVertical: boolean;
 
     constructor(_mapX: number, _mapY: number, _isVertical: boolean, _isOpenable: boolean) {
-        let doorPosition = new Position(_mapX * , _mapY);
+        let doorPosition = new Position(_mapX, _mapY);
         super(doorPosition, false, true, (_isVertical) ? doorWidth : doorLength, (_isVertical) ? doorLength : doorWidth);
 
         this.mazePosition = new Position(_mapX, _mapY);
