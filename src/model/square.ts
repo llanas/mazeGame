@@ -1,13 +1,17 @@
 import Door from "./door";
+import { PhysicalRectangle } from "./physics/physical-objects-interfaces";
 
-export default class Square {
-
+export default class Square implements PhysicalRectangle {
+    
     public static listSquares: Square[] = [];
 
-    position: number;
-    number: number;
+    width = 20;
+    height = 20;
     x: number;
     y: number;
+    
+    position: number;
+    number: number;
     isTreated: boolean;
     isInSolutionPath: boolean;
 

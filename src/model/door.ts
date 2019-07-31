@@ -1,6 +1,11 @@
-export default class Door {
+import { PhysicalRectangle } from "./physics/physical-objects-interfaces";
 
+export default class Door implements PhysicalRectangle {
+    
     static listDoors: Door[] = [];
+    
+    width: number;
+    height: number;
 
     isOpenable: boolean;
     isOpen: boolean;
@@ -15,6 +20,8 @@ export default class Door {
         this.x = _mapX;
         this.y = _mapY;
         this.isVertical = _isVertical;
+        this.width = (this.isVertical) ? 2 : 20;
+        this.height = (this.isVertical) ? 20 : 2;
 
         Door.listDoors.push(this);
     }
