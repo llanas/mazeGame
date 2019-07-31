@@ -1,33 +1,42 @@
 import PhysicalObject from "./objects/physical-object";
-import * as Utils from './utils/physical-utils';
 import { Direction, Position } from "./utils/physical-tools";
+import Door from "../model/door";
+import PhysicsUtils from "./utils/physical-utils";
 
 export default class PhysicalEngine {
 
     public static move(object: PhysicalObject, direction: Direction, speed: number): void {
+
         if(object.movable) {
-            let oldPositionX = object.position.x;
-            let oldPositionY = object.position.y;
 
-            object.position.x =+ (speed * Math.cos(Utils.toRadian(direction.angle))) + object.position.x;
-            object.position.y =+ (speed * Math.sin(Utils.toRadian(direction.angle))) + object.position.y;
+            let newX = Number((speed * Math.cos(PhysicsUtils.toRadian(direction.angle))).toFixed(2)) + object.position.x;
+            let newY = Number((speed * Math.sin(PhysicsUtils.toRadian(direction.angle))).toFixed(2)) + object.position.y;
 
-            let objectColidingWith = PhysicalEngine.getCollision(object);
-            if(objectColidingWith != null) {
-                object.position.x = oldPositionX;
-                object.position.y = oldPositionY;
+            let listColidingObjects = PhysicalObject.getListColidingsObjects(object.position.gridPosition);
+
+            let xColiding = false;
+            let yColiding = false;
+
+            for (let i = 0; i < listColidingObjects.length; i++) {
+                const objectColidingWith = listColidingObjects[i];
+
+                if(object.checkCollision(objectColidingWith, {x: newX, y: newY})) {
+                    if(!object.sliding) return;
+
+                    if(objectColidingWith instanceof Door) {
+                        if(objectColidingWith.isVertical) {
+                            if(xColiding) return;
+                            yColiding = true;
+                            newX = object.position.x;
+                        } else {
+                            if(yColiding) return;
+                            xColiding = true;
+                            newY = object.position.y;
+                        }
+                    }
+                }
             }
+            object.position = new Position(newX, newY);
         }
-    }
-    
-    static getCollision(object: PhysicalObject): PhysicalObject {
-
-        for (let i = 0; i < PhysicalObject.listColidingObjects.length; i++) {
-            const motionLessIterator = PhysicalObject.listColidingObjects[i];
-            if(object.checkCollision(motionLessIterator)) {
-                return motionLessIterator;
-            }
-        }
-        return null;
     }
 }

@@ -51,17 +51,17 @@ export default class Drawer {
 
     drawSquare(_square: Square): void {
         this.context.fillStyle = _square.getColor();
-        this.context.fillRect(_square.position.x * squareSize, _square.position.y * squareSize, squareSize, squareSize);
+        this.context.fillRect(_square.position.x, _square.position.y, squareSize, squareSize);
     }
 
     drawDoor(_door: Door): void {
         if (!_door.isOpen) {
             this.context.fillStyle = 'rgb(0,0,0)';
             if (_door.isVertical) {
-                this.context.fillRect((_door.position.x * squareSize) - 1, _door.position.y * squareSize, 1, squareSize);
+                this.context.fillRect(_door.position.x - 1, _door.position.y, 1, squareSize);
             }
             else {
-                this.context.fillRect(_door.position.x * squareSize, (_door.position.y * squareSize) - 1, squareSize, 1);
+                this.context.fillRect(_door.position.x, _door.position.y - 1, squareSize, 1);
             }
         }
     }

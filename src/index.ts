@@ -8,20 +8,20 @@ import GameController from "./controls/game-controller";
 import PhysicalEngine from "./physics/physical-engine";
 import Player from "./model/player";
 import { Direction, Position } from "./physics/utils/physical-tools";
+import PhysicalObject from "./physics/objects/physical-object";
 
-const framePerSeconds = 32;
-let squareSizes = 20;
+export let maze: MazeGrid = null;
 
-let maze: MazeGrid = null;
 let mazeGenAlgo: IMazeGenerator;
 let drawer: Drawer = null;
 
 let player: Player = null;
 
-
 // GAME CONTROLLER
 let gameController: GameController = null;
 let animationFrameId: number = null;
+let lastAnimationFrameId: number = 0;
+let fpsInterval: number;
 
 export function init() {
     initMaze();
@@ -32,16 +32,16 @@ export function init() {
 }
 
 export function start() {
+    fpsInterval = setInterval(updateFrameId, 1000);
     if(animationFrameId == null) {
         gameController = new GameController();
-        player = new Player(10, 10);
+        player = new Player(new Position(10, 10));
         render();
         animationFrameId = window.requestAnimationFrame(update);
     }
 }
 
 function update(timeStamp: DOMHighResTimeStamp) {
-    updateFrameId(animationFrameId);
     let deltaX = 0;
     let deltaY = 0;
     if(gameController.upPressed) deltaY--;
@@ -50,8 +50,13 @@ function update(timeStamp: DOMHighResTimeStamp) {
     if(gameController.leftPressed) deltaX--;
 
     if(deltaX !== 0 || deltaY !== 0) {
-        let playerDirection = Direction.buildDirectionFromPositions(new Position(deltaX, deltaY));
+        let playerDirection = Direction.buildDirectionFromPositions(Position.buildFromGridPosition(deltaX, deltaY));
         PhysicalEngine.move(player, playerDirection, player.speed);
+    }
+    if(player.position.gridPosition.x === maze.mazeWidth - 1 && player.position.gridPosition.y === maze.mazeHeight - 1) {
+        stop();
+        alert("YOU WIN BATARD !");
+        return;
     }
     render();
     // Rendering
@@ -63,12 +68,15 @@ export function stop() {
     gameController = null;
     player = null;
     animationFrameId = null;
-    updateFrameId(animationFrameId);
+    lastAnimationFrameId = 0;
+    clearInterval(fpsInterval);
 }
 
-function updateFrameId(frameId: number | null) {
-    let frameIdInput = <HTMLInputElement> document.getElementById("animationFrameId")
-    frameIdInput.value = "" + frameId;
+function updateFrameId() {
+    let deltaFrame = animationFrameId - lastAnimationFrameId;
+    lastAnimationFrameId = animationFrameId;
+    let frameIdInput = <HTMLInputElement> document.getElementById("framePerSecond");
+    frameIdInput.value = "" + deltaFrame;
 }
 
 function render() {
@@ -81,6 +89,7 @@ function render() {
 export function initMaze() {
     let _mapWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
     let _mapHeightInput = <HTMLInputElement> document.getElementById("mapHeight");
+
     maze = new MazeGrid(_mapWidthInput.valueAsNumber, _mapHeightInput.valueAsNumber);
     mazeGenAlgo = _getMazeGenAlgo();
 }

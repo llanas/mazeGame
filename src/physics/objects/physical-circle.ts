@@ -1,37 +1,34 @@
 import PhysicalObject from "./physical-object";
-import { Position } from "../utils/physical-tools";
+import { Position, Coordonate } from "../utils/physical-tools";
 import PhysicalRectangle from "./physical-rectangle";
+import PhysicsUtils from "../utils/physical-utils";
 
 export default class PhysicalCircle extends PhysicalObject {
 
     radius: number;
 
-    constructor(_position: Position, _movable: boolean, _coliding: boolean, _radius: number) {
-        super(_position, _movable, _coliding);
+    constructor(_position: Position, _movable: boolean, _coliding: boolean, _sliding: boolean, _radius: number) {
+        super(_position, _movable, _coliding, _sliding);
         this.radius = _radius;
     }
 
-    checkCollision(object: PhysicalObject): boolean {
+    checkCollision(object: PhysicalObject, newPosition: Coordonate): boolean {
         let isColliding = false;
         if(object instanceof PhysicalRectangle) {
-            let deltaX = Math.abs(this.position.x - (object.position.x - object.width / 2));
-            let deltaY = Math.abs(this.position.y - (object.position.y - object.height / 2));
+            let closestX = PhysicsUtils.findClosestFromCircleCenter(newPosition.x, object.position.x, object.position.x + object.width);
+            let closestY = PhysicsUtils.findClosestFromCircleCenter(newPosition.y, object.position.y, object.position.y + object.height);
 
-            if(deltaX > (this.radius + object.width / 2)) return false;
-            if(deltaY > (this.radius + object.height / 2)) return false;
+            let deltaX = newPosition.x - closestX;
+            let deltaY = newPosition.y - closestY;
 
-            if(deltaX <= (object.width / 2)) return true;
-            if(deltaY <= (object.height / 2)) return true;
-
-            let dx = deltaX - object.width / 2;
-            let dy = deltaY - object.height / 2;
-            isColliding =  (dx * dx + dy * dy <= (this.radius * this.radius));
-        } else {
-            let deltaX = this.position.x - object.position.x;
-            var deltaY = this.position.y - object.position.y;
+            isColliding = Math.pow(deltaX, 2) + Math.pow(deltaY, 2) < Math.pow(this.radius, 2);
+        } else if(object instanceof PhysicalCircle) {
+            let deltaX = newPosition.x - object.position.x;
+            var deltaY = newPosition.y - object.position.y;
             var distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
             isColliding = distance < this.radius + this.radius;
         }
+        return isColliding;
     }
 }

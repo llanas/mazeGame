@@ -1,5 +1,8 @@
 import Square from "./square";
 import Door from "./door";
+import { Position } from "../physics/utils/physical-tools";
+import PhysicalCircle from "../physics/objects/physical-circle";
+import PhysicalObject from "../physics/objects/physical-object";
 
 export default class MazeGrid {
     
@@ -16,6 +19,7 @@ export default class MazeGrid {
         this.listDoors = [];
         this.grid = [];
         this.isFullyGenerated = false;
+        PhysicalObject.gridObjects = [];
         
         this.generateGrid();
         this.generateDoors();
@@ -38,6 +42,7 @@ export default class MazeGrid {
                 colomn.push(square);
             }
         }
+        PhysicalObject.buildGridObjects(this.mazeWidth, this.mazeHeight);
     }
 
     private generateDoors() {
@@ -47,21 +52,21 @@ export default class MazeGrid {
             if(square.position.y !== 0) {
                 square.topDoor = this.getSquareByPosition(square.number - 1).bottomDoor;
             } else {
-                square.topDoor = this._buildDoor(square.position.x, square.position.y, false, false);
+                square.topDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, false, false);
             }
 
             if(square.position.x !== 0) {
                 square.leftDoor = this.getSquareByPosition(square.number - this.mazeHeight).rightDoor;
             } else {
-                square.leftDoor = this._buildDoor(square.position.x, square.position.y, true, false);
+                square.leftDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, true, false);
             }
 
-            square.rightDoor = this._buildDoor(square.position.x + 1, square.position.y, true, square.position.x !== this.mazeWidth - 1);
-            square.bottomDoor = this._buildDoor(square.position.x, square.position.y + 1, false, square.position.y !== this.mazeHeight - 1);
+            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.mazeWidth - 1);
+            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.mazeHeight - 1);
         }
     }
 
-    getSquare(_gridX: number, _gridY: number): Square {
+    getSquareByGridPosition(_gridX: number, _gridY: number): Square {
         if(_gridX < this.mazeWidth && _gridY < this.mazeHeight) {
             return this.grid[_gridX][_gridY];
         } else {
@@ -71,7 +76,6 @@ export default class MazeGrid {
 
     getSquareByPosition(position: number): Square {
         return this.listSquares[position];
-        // return this.grid[Math.round(position / (this.mazeWidth / this.mazeHeight))][(position % this.mazeHeight) - 1];
     }
 
     getSquareByDoor(basedSquare: Square, door: Door): Square {
@@ -79,13 +83,13 @@ export default class MazeGrid {
         let yPosition;
         if(door.isOpenable) {
             if(door.isVertical) {
-                xPosition = (door.position.x === basedSquare.position.x) ? door.position.x - 1 : door.position.x;
-                yPosition = door.position.y;
+                xPosition = (door.position.gridPosition.x === basedSquare.position.gridPosition.x) ? door.position.gridPosition.x - 1 : door.position.gridPosition.x;
+                yPosition = door.position.gridPosition.y;
             } else {
-                xPosition = door.position.x;
-                yPosition = (door.position.y === basedSquare.position.y) ? door.position.y - 1 : door.position.y;
+                xPosition = door.position.gridPosition.x;
+                yPosition = (door.position.gridPosition.y === basedSquare.position.gridPosition.y) ? door.position.gridPosition.y - 1 : door.position.gridPosition.y;
             }
-            return this.getSquare(xPosition, yPosition);
+            return this.getSquareByGridPosition(xPosition, yPosition);
         } else {
             throw "La porte n'est pas ouvrable";
         }
@@ -117,14 +121,21 @@ export default class MazeGrid {
         }
     }
 
-    private _buildSquare(_positionX: number, _positionY: number): Square {
-        let newSquare = new Square(this.listSquares.length, _positionX, _positionY);
+    private _buildSquare(_gridX: number, _gridY: number): Square {
+        let squarePosition = Position.buildFromGridPosition(_gridX, _gridY);
+        let newSquare = new Square(this.listSquares.length, squarePosition);
         this.listSquares.push(newSquare);
         return newSquare;
     }
 
-    private _buildDoor(_positionX: number, _positionY: number, _isVerticale: boolean, _isOpenable: boolean): Door {
-        let newDoor = new Door(_positionX, _positionY, _isVerticale, _isOpenable);
+    private _buildDoor(_gridX: number, _gridY: number, _isVerticale: boolean, _isOpenable: boolean): Door {
+        let doorPosition = Position.buildFromGridPosition(_gridX, _gridY);
+        // if(_isVerticale) {
+        //     doorPosition.x--;
+        // } else {
+        //     doorPosition.y--;
+        // }
+        let newDoor = new Door(doorPosition, _isVerticale, _isOpenable);
         this.listDoors.push(newDoor);
         return newDoor;
     }

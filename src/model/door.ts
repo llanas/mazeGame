@@ -8,17 +8,14 @@ export default class Door extends PhysicalRectangle {
 
     public static listDoors: Door[] = [];
 
-    mazePosition: Position;
     isOpenable: boolean;
     isOpen: boolean;
 
     isVertical: boolean;
 
-    constructor(_mapX: number, _mapY: number, _isVertical: boolean, _isOpenable: boolean) {
-        let doorPosition = new Position(_mapX, _mapY);
-        super(doorPosition, false, true, (_isVertical) ? doorWidth : doorLength, (_isVertical) ? doorLength : doorWidth);
+    constructor(_position: Position, _isVertical: boolean, _isOpenable: boolean) {
+        super(_position, false, true, (_isVertical) ? doorWidth : doorLength, (_isVertical) ? doorLength : doorWidth);
 
-        this.mazePosition = new Position(_mapX, _mapY);
         this.isOpenable = _isOpenable;
         this.isOpen = false;
         this.isVertical = _isVertical;
@@ -29,6 +26,11 @@ export default class Door extends PhysicalRectangle {
     open(): void {
         if (this.isOpenable) {
             this.isOpen = true;
+            this.coliding = false;
         }
+    }
+
+    toString() {
+        return `[${this.position.gridPosition.x},${this.position.gridPosition.y} - ${this.isVertical}] - open : ${this.isOpen} - coliding : ${this.coliding}`;
     }
 }

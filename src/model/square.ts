@@ -10,7 +10,6 @@ export default class Square extends PhysicalRectangle {
     public static listSquares: Square[] = [];
 
     position: Position;
-    mazePosition: Position;
     number: number;
     isTreated: boolean;
     isInSolutionPath: boolean;
@@ -20,11 +19,9 @@ export default class Square extends PhysicalRectangle {
     bottomDoor: Door;
     leftDoor: Door;
 
-    constructor(_number: number, _mapX: number, _mapY: number) {
-        let squarePosition = new Position(_mapX * squareWidth, _mapY * squareHeight);
-        super(squarePosition, false, false, squareWidth, squareHeight);
-        
-        this.mazePosition = new Position(_mapX, _mapY);
+    constructor(_number: number, position: Position) {
+        super(position, false, false, squareWidth, squareHeight);
+
         this.number = _number;
         this.isTreated = false;
         
