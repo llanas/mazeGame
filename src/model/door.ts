@@ -1,11 +1,12 @@
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 import { Constants } from "../utils/constants";
+import { ObjectRenderer } from "../renderer/object-renderer";
 
 export default class Door extends PhysicalRectangle {
 
     public static listDoors: Door[] = [];
-
+    
     isOpenable: boolean;
     isOpen: boolean;
 
@@ -23,12 +24,12 @@ export default class Door extends PhysicalRectangle {
             _height = Constants.gridSquareSize / 10;
             _width = Constants.gridSquareSize + (_height / 2);
         }
-        super(_position, false, true, _width, _height);
+
+        super(_position, false, true, _width, _height, ObjectRenderer.doors);
 
         this.isOpenable = _isOpenable;
         this.isOpen = false;
         this.isVertical = _isVertical;
-
         Door.listDoors.push(this);
     }
 

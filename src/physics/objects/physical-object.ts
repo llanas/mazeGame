@@ -1,7 +1,8 @@
 import { Position, Coordonate } from "../utils/physical-tools";
 import Vector from "./physical-vector";
+import { ObjectRenderer } from "../../renderer/object-renderer";
 
-export default class PhysicalObject {
+export class PhysicalObject {
     
 
     public static listMovableObjects: PhysicalObject[] = [];
@@ -29,7 +30,9 @@ export default class PhysicalObject {
         
         let listColidingObjects = [];
         for (let x = minX; x <= maxX; x++) {
+            if(PhysicalObject.gridObjects[x] == undefined) continue;
             for (let y = minY; y <= maxY; y++) {
+                if(PhysicalObject.gridObjects[x][y] == undefined) continue;
                 for (let i = 0; i < PhysicalObject.gridObjects[x][y].length; i++) {
                     if(PhysicalObject.gridObjects[x][y][i].coliding) {
                         listColidingObjects.push(PhysicalObject.gridObjects[x][y][i]);
@@ -40,31 +43,74 @@ export default class PhysicalObject {
         return listColidingObjects;       
     }
 
+    static moveObjectToAnotherGridPosition(oldPosition: Position, object: PhysicalObject) {
+        PhysicalObject.deleteObjectFromGridPositionObjects(object, oldPosition);
+        PhysicalObject.gridObjects[object.position.gridPosition.x][object.position.gridPosition.y].push(object);
+    }
+
+    static deleteObjectFromGridPositionObjects(object: PhysicalObject, oldPosition?: Position) {
+        let position = (oldPosition) ? oldPosition : object.position;
+        let oldGridPositionObjects = PhysicalObject.gridObjects[position.gridPosition.x][position.gridPosition.y];
+        let indexInGridPositionObjects = oldGridPositionObjects.indexOf(object);
+        if(indexInGridPositionObjects != -1) {
+            oldGridPositionObjects.splice(indexInGridPositionObjects, 1);
+        }
+    }
+
     position: Position;
     movable: boolean;
     coliding: boolean;
-    sliding: boolean = false;
 
-    constructor(_position: Position, _movable: boolean, _coliding: boolean, _sliding?: boolean) {
+    protected sliding: boolean = false;
+    protected destroyOnColision: boolean = false;
+    protected movingVector: Vector | null;
+
+    protected _renderer: ObjectRenderer;
+    public get renderer(): ObjectRenderer {
+        return this._renderer;
+    }
+    public set renderer(renderer: ObjectRenderer) {
+        this._renderer = renderer;
+    }
+
+    constructor(_position: Position, _movable: boolean, _coliding: boolean, _renderer: ObjectRenderer = ObjectRenderer.defaultRenderer()) {
         this.position = _position;
         this.movable = _movable;
         this.coliding = _coliding;
-        this.sliding = _sliding;
+        this._renderer = _renderer;
 
         if(this.movable) {
             PhysicalObject.listMovableObjects.push(this);
-        } else if(this.coliding) {
+        } 
+        if(this.coliding) {
             PhysicalObject.listColidingObjects.push(this);
             PhysicalObject.gridObjects[this.position.gridPosition.x][this.position.gridPosition.y].push(this);
         }
     }
 
-    move(movingVector: Vector) {
+    move(movingVector: Vector = this.movingVector) {
         if(this.movable) {
+            if(movingVector != null) {
+                let oldPosition = this.position;
+                this.position.move(movingVector);
+                if(oldPosition.gridPosition != this.position.gridPosition) {
+                    PhysicalObject.moveObjectToAnotherGridPosition(oldPosition, this);
+                }
+            }
         }
     }
 
     checkCollision(object: PhysicalObject, newPosition: Coordonate): boolean {
         return (newPosition.x === object.position.x || newPosition.y === object.position.y);
+    }
+
+    destroy() {
+        if(this.coliding) {
+            PhysicalObject.listColidingObjects.splice(PhysicalObject.listColidingObjects.indexOf(this));
+            PhysicalObject.deleteObjectFromGridPositionObjects(this);
+        }
+        if(this.movable) {
+            PhysicalObject.listMovableObjects.splice(PhysicalObject.listMovableObjects.indexOf(this));
+        }
     }
 }

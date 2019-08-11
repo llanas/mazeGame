@@ -1,16 +1,16 @@
-import PhysicalObject from "./physical-object";
-import { Position, Coordonate, Direction } from "../utils/physical-tools";
+import { PhysicalObject } from "./physical-object";
+import { Position, Coordonate } from "../utils/physical-tools";
 import PhysicalCircle from "./physical-circle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
-import { Constants } from "../../utils/constants";
+import { ObjectRenderer } from "../../renderer/object-renderer";
 
 export default class PhysicalRectangle extends PhysicalObject {
 
     width: number;
     height: number;
 
-    constructor(_position: Position, _movable: boolean, _coliding: boolean, _width: number, _height: number) {
+    constructor(_position: Position, _movable: boolean, _coliding: boolean, _width: number, _height: number, _renderer?: ObjectRenderer) {
         super(_position, _movable, _coliding);
         this.width = _width;
         this.height = _height;

@@ -1,6 +1,6 @@
-import Square from "./square";
-import { MazeGrid } from "./maze-grid";
-import Door from "./door";
+import Square from "../model/square";
+import { MazeGrid } from "../model/maze-grid";
+import Door from "../model/door";
 
 class Node {
     partOf: number[] = [];

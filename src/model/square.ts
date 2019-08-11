@@ -3,6 +3,7 @@ import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 import { Constants } from "../utils/constants";
 import { Color } from "../utils/utils";
+import { ObjectRenderer } from "../renderer/object-renderer";
 
 export default class Square extends PhysicalRectangle {
 
@@ -39,16 +40,15 @@ export default class Square extends PhysicalRectangle {
         return listDoorsOpen;
     }
 
-    getColor(): Color {
+    get renderer(): ObjectRenderer {
         if(this.isInSolutionPath) {
-            return new Color(125, 125, 200);
+            return ObjectRenderer.squareInSolution;
         } else{
-            return (this.isTreated) ? new Color(200, 225, 55) : new Color(220, 90, 90);
+            return (this.isTreated) ? ObjectRenderer.squareTreated : ObjectRenderer.squareBase;
         }
     }
 
     // GETTEUR SETTEURS
-    
     public get hasBeenPassed(): boolean {
         return this._hasBeenPassed;
     }

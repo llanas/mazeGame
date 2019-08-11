@@ -1,32 +1,37 @@
-import PhysicalObject from "./physical-object";
+import { PhysicalObject } from "./physical-object";
 import { Position } from "../utils/physical-tools";
 import PhysicalRectangle from "./physical-rectangle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
+import { ObjectRenderer } from "../../renderer/object-renderer";
 
 export default class PhysicalCircle extends PhysicalObject {
 
     radius: number;
 
-    constructor(_position: Position, _movable: boolean, _coliding: boolean, _sliding: boolean, _radius: number) {
-        super(_position, _movable, _coliding, _sliding);
+    constructor(_position: Position, _movable: boolean, _coliding: boolean, _radius: number, _renderer?: ObjectRenderer) {
+        super(_position, _movable, _coliding, _renderer);
         this.radius = _radius;
     }
 
-    move(movingVector: Vector) {
-        let listColingObject = PhysicalObject.getListColidingsObjects(this.position.gridPosition);
-        for (let i = 0; i < listColingObject.length; i++) {
-            const objectColidingWith = listColingObject[i];
-            if(this.checkCollision(objectColidingWith, movingVector)) {
-                if(this.sliding) {
-                    if(objectColidingWith instanceof PhysicalRectangle) {
-                        movingVector = objectColidingWith.getVectorAfterSlide(this.position, this.radius, movingVector);
-                        if(movingVector.isZero()) return;
+    move(movingVector: Vector = this.movingVector) {
+        if(movingVector != null) {
+            let listColingObject = PhysicalObject.getListColidingsObjects(this.position.gridPosition);
+            for (let i = 0; i < listColingObject.length; i++) {
+                const objectColidingWith = listColingObject[i];
+                if(this.checkCollision(objectColidingWith, movingVector)) {
+                    if(this.sliding) {
+                        if(objectColidingWith instanceof PhysicalRectangle) {
+                            movingVector = objectColidingWith.getVectorAfterSlide(this.position, this.radius, movingVector);
+                            if(movingVector.isZero()) return;
+                        }
+                    } else if(this.destroyOnColision) {
+                       this.destroy();
                     }
                 }
             }
+            super.move(movingVector);
         }
-        this.position.move(movingVector);
     }
 
     checkCollision(object: PhysicalObject, movingVector: Vector): boolean {

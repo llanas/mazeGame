@@ -1,5 +1,5 @@
 import { MazeGrid } from "./model/maze-grid";
-import Drawer from "./game/drawer";
+import { Drawer } from "./renderer/drawer";
 import { IMazeGenerator } from "./algo/mazegen/mazegen-interface";
 import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
@@ -10,6 +10,7 @@ import { Constants } from "./utils/constants";
 export let v = Vector;
 export let mazeGrid = MazeGrid;
 export let game: Game = null;
+export let constant = Constants;
 
 let mazeGenAlgo: IMazeGenerator;
 let groundLayerDrawer: Drawer = null;
@@ -96,6 +97,12 @@ export function start() {
     game.start();
 }
 
+export function addEnemi() {
+    if(game != null) {
+        game.addEnemy();
+    }
+}
+
 export function stop() {
     game.end();
     game = null;
@@ -106,3 +113,9 @@ function updateFrameId() {
     let frameIdInput = <HTMLInputElement> document.getElementById("framePerSecond");
     frameIdInput.value = "" + game.fps;
 }
+
+(function() {
+    let domGameContent = <HTMLElement> document.getElementById("gameContent");
+    Constants.canvasOffsetLeft = domGameContent.offsetLeft;
+    Constants.canvasOffsetTop = domGameContent.offsetTop;
+})();

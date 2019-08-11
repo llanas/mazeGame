@@ -1,8 +1,9 @@
 import Square from "./square";
 import Door from "./door";
 import { Position } from "../physics/utils/physical-tools";
-import PhysicalObject from "../physics/objects/physical-object";
-import { TreeNode } from "./treeNode";
+import { PhysicalObject } from "../physics/objects/physical-object";
+import { TreeNode } from "../algo/treeNode";
+import { Constants } from "../utils/constants";
 
 export class MazeGrid {
 
@@ -18,6 +19,8 @@ export class MazeGrid {
 
     static builder(_mazeWidth: number, _mazeHeight: number) {
         MazeGrid.instance = new MazeGrid(_mazeWidth, _mazeHeight);
+        Constants.mazeWidth = _mazeWidth;
+        Constants.mazeHeight = _mazeHeight;
     }
     
     public mazeWidth: number;

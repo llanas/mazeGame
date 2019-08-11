@@ -1,11 +1,13 @@
 import { MazeGrid } from "../model/maze-grid";
-import Square from "../model/square";
-import Door from "../model/door";
 import Player from "../model/player";
 import { Constants } from "../utils/constants";
-import { Color, Utils } from "../utils/utils";
+import { PhysicalObject } from "../physics/objects/physical-object";
+import PhysicalCircle from "../physics/objects/physical-circle";
+import PhysicalRectangle from "../physics/objects/physical-rectangle";
+import { Coordonate, Position } from "../physics/utils/physical-tools";
+import { ObjectRenderer } from "./object-renderer";
 
-export default class Drawer {
+export class Drawer {
 
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
@@ -21,6 +23,14 @@ export default class Drawer {
         } else {
             throw "Le canvas demandé n'existe pas ou n'est pas un élément canvas";
         }
+    }
+
+    public getCanvasPositionFromWindowCoordonate(coordonate: Coordonate): Position {
+        let rect = this.canvas.getBoundingClientRect();
+        let scaleX = this.canvas.width / rect.width;
+        let scaleY = this.canvas.height / rect.height;
+          
+        return new Position((coordonate.x - rect.left) * scaleX, (coordonate.y - rect.top) * scaleY);
     }
 
     display() {
@@ -44,35 +54,37 @@ export default class Drawer {
             this.resize();
             for (let x = 0; x < maze.mazeWidth; x++) {
                 for (let y = 0; y < maze.mazeHeight; y++) {
-                    this.drawSquare(maze.grid[x][y]);
+                    this._drawRectangle(maze.grid[x][y]);
                 }
             }
             for (let i = 0; i < maze.listDoors.length; i++) {
-                this.drawDoor(maze.listDoors[i]);
+                if(!maze.listDoors[i].isOpen)
+                this._drawRectangle(maze.listDoors[i]);
             }
         }
     }
 
-    drawPlayer(player: Player): void {
-        this.context.fillStyle = 'rgb(60, 200, 75)';
-        this.context.beginPath();
-        this.context.arc(player.position.x, player.position.y, player.radius, 0, 2 * Math.PI);
-        this.context.fill();
+    drawPhysicalObject(obj: PhysicalObject) {
+        if(obj instanceof PhysicalCircle) {
+            this._drawCircle(obj);
+        } else if(obj instanceof PhysicalRectangle) {
+            this._drawRectangle(obj);
+        }
     }
 
     drawClouds(player: Player) {
         let maze = MazeGrid.getInstance();
-        let color = Constants.cloudColor;
+        let cloudRenderer = ObjectRenderer.cloud;
         for (let x = 0; x < maze.listSquares.length; x++) {
             let square = maze.listSquares[x]
             /* if(player.listVisibleSquares.indexOf(square) != -1) {
                 color.opacity = 0;
             } else  */if(square.hasBeenPassed) {
-                color.opacity = .9;
+                cloudRenderer.color.opacity = .9;
             } else {
-                color.opacity = 1;
+                cloudRenderer.color.opacity = 1;
             }
-            this.drawSquare(maze.listSquares[x], color);
+            this._drawRectangle(maze.listSquares[x], cloudRenderer);
         }
         this.drawPlayerVisionCircle(player);
     }
@@ -86,15 +98,15 @@ export default class Drawer {
         this.context.restore();
     }
 
-    drawSquare(_square: Square, color?: Color): void {
-        this.context.fillStyle = (color) ? color.rgbValue : _square.getColor().rgbValue;
-        this.context.fillRect(_square.position.x, _square.position.y, _square.width, _square.height);
+    private _drawCircle(circle: PhysicalCircle, renderer?: ObjectRenderer) {
+        this.context.fillStyle = (renderer) ? renderer.color.rgbValue : circle.renderer.color.rgbValue;
+        this.context.beginPath();
+        this.context.arc(circle.position.x, circle.position.y, circle.radius, 0, 2 * Math.PI, false);
+        this.context.fill();
     }
 
-    drawDoor(_door: Door): void {
-        if (!_door.isOpen) {
-            this.context.fillStyle = 'rgb(0,0,0)';
-            this.context.fillRect(_door.position.x, _door.position.y, _door.width, _door.height);
-        }
+    private _drawRectangle(rectangle: PhysicalRectangle, renderer?: ObjectRenderer) {
+        this.context.fillStyle = (renderer) ? renderer.color.rgbValue : rectangle.renderer.color.rgbValue;
+        this.context.fillRect(rectangle.position.x, rectangle.position.y, rectangle.width, rectangle.height);
     }
 }
