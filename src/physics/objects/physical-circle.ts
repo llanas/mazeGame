@@ -4,9 +4,7 @@ import PhysicalRectangle from "./physical-rectangle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
 import { ObjectRenderer } from "../../renderer/object-renderer";
-import { PhysicalLayer } from "../layers/physical-layer";
 import { ColidingParameters } from "../utils/physical-parameters";
-import { Enemy } from "../../model/enemy";
 
 export default class PhysicalCircle extends PhysicalObject {
 
@@ -52,8 +50,6 @@ export default class PhysicalCircle extends PhysicalObject {
         } else if(this.colidingParameters.bouncing) {
             if(colidingObject instanceof PhysicalRectangle) {
                 this.movingVector = colidingObject.getVectorAfterBounce(this.position, this.movingVector);
-            } else if(colidingObject instanceof Enemy) {
-                this.destroy();
             }
         } else if(this.colidingParameters.destroyOnColision) {
            this.destroy();

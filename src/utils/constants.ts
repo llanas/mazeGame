@@ -14,7 +14,7 @@ export class Constants {
     // PLAYER
     static defaultPlayerSpeed = 8;
     static playerSize = Constants.gridSquareSize / 5;
-    static playerVisibilityRadius = Constants.gridSquareSize * 5;
+    static playerVisibilityRadius = Constants.gridSquareSize * 20;
     static playerFireDetonationCooldown = 200;
 
     // ENEMIES

@@ -5,16 +5,16 @@ import { Constants } from "../utils/constants";
 import { ObjectRenderer } from "../renderer/object-renderer";
 import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 import { PhysicalObject } from "../physics/objects/physical-object";
-import { ILiving } from "./living/living-interface";
+import { ILiving } from "./interfaces/living-interface";
+import { IMovable } from "./interfaces/movable-interface";
 
-export class Bullet extends PhysicalCircle {
+export class Bullet extends PhysicalCircle implements IMovable {
 
-    movingVector: Vector;
     damage: number = Constants.bulletDamage;
     speed: number = Constants.bulletSpeed;
     
     constructor(_position: Position, _direction: Vector) {
-        super(_position, Constants.bulletSize, CONST_COLIDING_PARAMETERS.BULLET_BOUNCING, ObjectRenderer.bullet);
+        super(_position, Constants.bulletSize, CONST_COLIDING_PARAMETERS.BULLET_COLIDING, ObjectRenderer.bullet);
         this.movingVector = _direction.normalize().scale(this.speed);
     }
 

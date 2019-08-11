@@ -11,6 +11,9 @@ import { PlayerLayer } from "../physics/layers/player-layer";
 import { GroundLayer } from "../physics/layers/ground-layer";
 import { EnemiesLayer } from "../physics/layers/enemies-layer";
 import { UpperLayer } from "../physics/layers/upper-layer";
+import { TreeNode } from "../algo/treeNode";
+import { MazeGrid } from "../model/maze-grid";
+import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 
 export class Game {
 
@@ -33,7 +36,7 @@ export class Game {
 
     private animationFrameId: number;
 
-    private groundLayer: GroundLayer;
+    public groundLayer: GroundLayer;
     private playerLayer: PlayerLayer;
     private enemiesLayer: EnemiesLayer;
     private upperLayer: UpperLayer;
@@ -72,6 +75,16 @@ export class Game {
         }
         
         this.playerLayer.moveAll(this.groundLayer, this.enemiesLayer);
+        let listEnemies = <Enemy[]> this.enemiesLayer.matrix.getAll<Enemy>(CONST_COLIDING_PARAMETERS.PERSONNAGE_COLIDING, Enemy);
+        for (let i = 0; i < listEnemies.length; i++) {
+            const enemy = listEnemies[i];
+            if(enemy.position.gridPosition === this.player.position.gridPosition) {
+                enemy.movingVector = this.player.position.vector.clone().subtract(enemy.position.vector).normalize().scale(enemy.speed);
+            } else {
+                let pathToPlayer = playerTreeNode.getPathToSquare(this.groundLayer.mazeGrid.getSquare(enemy.position.gridPosition.x, enemy.position.gridPosition.y));
+                enemy.movingVector = MazeGrid.getVectorBetweenSquare(pathToPlayer[pathToPlayer.length - 1], pathToPlayer[pathToPlayer.length - 2]).normalize().scale(enemy.speed);
+            }
+        }
         this.enemiesLayer.moveAll(this.groundLayer, this.playerLayer);
         
         this.render();

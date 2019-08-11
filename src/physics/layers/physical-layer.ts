@@ -27,7 +27,9 @@ export class PhysicalLayer {
                 }
                 if(listColidingObjects.length != 0) {
                     for (let z = 0; z < listColidingObjects.length; z++) {
-                        movingObject.colidingWith(listColidingObjects[z]);
+                        if(listColidingObjects[z].checkCollision(movingObject, movingObject.getPositionAfterMove())) {
+                            movingObject.colidingWith(listColidingObjects[z]);
+                        }
                     }
                 }
                 this.move(movingObject);

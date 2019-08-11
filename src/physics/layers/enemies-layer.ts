@@ -1,11 +1,8 @@
 import { PhysicalLayer } from "./physical-layer";
-import { Enemy } from "../../model/enemy";
 import { Constants } from "../../utils/constants";
 import { Drawer } from "../../renderer/drawer";
 
 export class EnemiesLayer extends PhysicalLayer {
-
-    listEnemies: Enemy[];
 
     constructor(drawer: Drawer) {
         super(Constants.mazeWidth, Constants.mazeHeight, drawer);

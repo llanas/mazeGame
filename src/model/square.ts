@@ -40,6 +40,10 @@ export class Square extends PhysicalRectangle {
         return listDoorsOpen;
     }
 
+    getCenterPosition(): Position {
+        return new Position(this.position.x + (this.width / 2), this.position.y + (this.height / 2));
+    }
+
     get renderer(): ObjectRenderer {
         if(this.isInSolutionPath) {
             return ObjectRenderer.squareInSolution;

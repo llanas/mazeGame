@@ -5,6 +5,7 @@ import { TreeNode } from "../algo/treeNode";
 import { PhysicalMatrix } from "../physics/utils/physical-matrix";
 import { PhysicalObject } from "../physics/objects/physical-object";
 import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
+import Vector from "../physics/objects/physical-vector";
 
 export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
 
@@ -25,6 +26,10 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
 
         this._generateGrid();
         this._generateDoors();
+    }
+
+    static getVectorBetweenSquare(squareA: Square, squareB: Square): Vector {
+        return squareB.getCenterPosition().vector.clone().subtract(squareA.getCenterPosition().vector);
     }
 
     getSquare(x: number, y: number): Square {
@@ -96,7 +101,7 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
     public set isFullyGenerated(value: boolean) {
         this._isFullyGenerated = value;
         if(value) {
-            this._treeNode = new TreeNode(this);
+            this._treeNode = new TreeNode(this.listSquares[0]);
         }
     }
 
