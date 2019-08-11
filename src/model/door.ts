@@ -2,6 +2,7 @@ import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 import { Constants } from "../utils/constants";
 import { ObjectRenderer } from "../renderer/object-renderer";
+import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 
 export default class Door extends PhysicalRectangle {
 
@@ -25,7 +26,7 @@ export default class Door extends PhysicalRectangle {
             _width = Constants.gridSquareSize + (_height / 2);
         }
 
-        super(_position, false, true, _width, _height, ObjectRenderer.doors);
+        super(_position, _width, _height, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.doors);
 
         this.isOpenable = _isOpenable;
         this.isOpen = false;
@@ -36,11 +37,7 @@ export default class Door extends PhysicalRectangle {
     open(): void {
         if (this.isOpenable) {
             this.isOpen = true;
-            this.coliding = false;
+            this.colidingParameters.coliding = false;
         }
-    }
-
-    toString() {
-        return `[${this.position.gridPosition.x},${this.position.gridPosition.y} - ${this.isVertical}] - open : ${this.isOpen} - coliding : ${this.coliding}`;
     }
 }

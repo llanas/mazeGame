@@ -1,67 +1,44 @@
-import Square from "./square";
+import { Square } from "./square";
 import Door from "./door";
-import { Position } from "../physics/utils/physical-tools";
-import { PhysicalObject } from "../physics/objects/physical-object";
+import { Position, ListPhysicalObject } from "../physics/utils/physical-tools";
 import { TreeNode } from "../algo/treeNode";
-import { Constants } from "../utils/constants";
+import { PhysicalMatrix } from "../physics/utils/physical-matrix";
+import { PhysicalObject } from "../physics/objects/physical-object";
+import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 
-export class MazeGrid {
+export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
 
-    private static instance: MazeGrid;
-
-    static getInstance(): MazeGrid {
-        if(MazeGrid.instance != null && MazeGrid.instance != undefined) {
-            return MazeGrid.instance;
-        } else {
-            throw "Aucune instance de MazeGrid";
-        }
-    }
-
-    static builder(_mazeWidth: number, _mazeHeight: number) {
-        MazeGrid.instance = new MazeGrid(_mazeWidth, _mazeHeight);
-        Constants.mazeWidth = _mazeWidth;
-        Constants.mazeHeight = _mazeHeight;
-    }
+    public listSquares: ListPhysicalObject<Square> = new ListPhysicalObject<Square>();
+    public listDoors:  ListPhysicalObject<Door> = new ListPhysicalObject<Door>();
     
-    public mazeWidth: number;
-    public mazeHeight: number;
-    public grid: Square[][] = [];
+    width: number;
+    height: number;
 
-    public listSquares: Square[] = [];
-    public listDoors: Door[] = [];
-    
     private _treeNode: TreeNode;
     private _isFullyGenerated: boolean = false;
 
-    private constructor(_mazeWidth: number, _mazeHeight: number) {
-        this.mazeWidth = _mazeWidth;
-        this.mazeHeight = _mazeHeight;
+    constructor(_mazeWidth: number, _mazeHeight: number) {
+        super(_mazeWidth + 1, _mazeHeight + 1);
+
+        this.width = _mazeWidth;
+        this.height = _mazeHeight
 
         this._generateGrid();
         this._generateDoors();
     }
 
-    static resetMaze() {
-        PhysicalObject.gridObjects = [];
-        // MazeGrid.instance = new MazeGrid()
+    getSquare(x: number, y: number): Square {
+        return <Square> this.get<Square>(x, y, CONST_COLIDING_PARAMETERS.EMPTY_COLIDING, Square)[0];
     }
 
     getStraightPathsFromPosition(position: Position): Square[] {
-        let square = this.getSquareByGridPosition(position.gridPosition.x, position.gridPosition.y);
+        let square = this.getSquare(position.gridPosition.x, position.gridPosition.y);
         return this._treeNode.getStraightPathFromSquare(square);
     } 
 
     getSolutionPath(): Square[] {
         if(this.isFullyGenerated) {
             return this._treeNode.getPathToSquare(this.listSquares[this.listSquares.length - 1]);
-        }
-    }
-
-    getSquareByGridPosition(_gridX: number, _gridY: number): Square {
-        if(_gridX < this.mazeWidth && _gridY < this.mazeHeight) {
-            return this.grid[_gridX][_gridY];
-        } else {
-            throw "La case demandé n'est pas dans le labyrinthe";
         }
     }
 
@@ -80,7 +57,7 @@ export class MazeGrid {
                 xPosition = door.position.gridPosition.x;
                 yPosition = (door.position.gridPosition.y === basedSquare.position.gridPosition.y) ? door.position.gridPosition.y - 1 : door.position.gridPosition.y;
             }
-            return this.getSquareByGridPosition(xPosition, yPosition);
+            return this.getSquare(xPosition, yPosition);
         } else {
             throw "La porte n'est pas ouvrable";
         }
@@ -102,7 +79,7 @@ export class MazeGrid {
                 squareMin.isTreated = true;
                 squareMax.isTreated = true;
                 break;
-            case this.mazeHeight:
+            case this.height:
                 squareMin.rightDoor.open();
                 squareMin.isTreated = true;
                 squareMax.isTreated = true;
@@ -119,21 +96,17 @@ export class MazeGrid {
     public set isFullyGenerated(value: boolean) {
         this._isFullyGenerated = value;
         if(value) {
-            this._treeNode = new TreeNode();
+            this._treeNode = new TreeNode(this);
         }
     }
 
     // METHODES PRIVATE
     private _generateGrid(): void {
-        for(let x = 0; x < this.mazeWidth; x++) {
-            let colomn: Square[] = [];
-            this.grid.push(colomn);
-            for(let y = 0; y < this.mazeHeight; y++) {
-                let square = this._buildSquare(x, y);
-                colomn.push(square);
+        for(let x = 0; x < this.width; x++) {
+            for(let y = 0; y < this.height; y++) {
+                this._buildSquare(x, y);
             }
         }
-        PhysicalObject.buildGridObjects(this.mazeWidth, this.mazeHeight);
     }
 
     private _generateDoors() {
@@ -147,13 +120,13 @@ export class MazeGrid {
             }
 
             if(square.position.x !== 0) {
-                square.leftDoor = this.getSquareByPosition(square.number - this.mazeHeight).rightDoor;
+                square.leftDoor = this.getSquareByPosition(square.number - this.height).rightDoor;
             } else {
                 square.leftDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, true, false);
             }
 
-            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.mazeWidth - 1);
-            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.mazeHeight - 1);
+            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.width - 1);
+            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.height - 1);
         }
     }
 
@@ -161,6 +134,7 @@ export class MazeGrid {
         let squarePosition = Position.buildFromGridPosition(_gridX, _gridY);
         let newSquare = new Square(this.listSquares.length, squarePosition);
         this.listSquares.push(newSquare);
+        this.push(newSquare, squarePosition.gridPosition);
         return newSquare;
     }
 
@@ -168,6 +142,7 @@ export class MazeGrid {
         let doorPosition = Position.buildFromGridPosition(_gridX, _gridY);
         let newDoor = new Door(doorPosition, _isVerticale, _isOpenable);
         this.listDoors.push(newDoor);
+        this.push(newDoor, doorPosition.gridPosition);
         return newDoor;
     }
 }

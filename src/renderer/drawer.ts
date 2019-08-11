@@ -20,6 +20,7 @@ export class Drawer {
         if(this.canvas.getContext) {
             this.context = this.canvas.getContext("2d");
             this.resize();
+            this.display();
         } else {
             throw "Le canvas demandé n'existe pas ou n'est pas un élément canvas";
         }
@@ -46,47 +47,12 @@ export class Drawer {
         this.canvas.height = height;
     }
 
-    drawMaze(): void {
-        let maze = MazeGrid.getInstance();
-        if(maze != null && maze.grid.length != 0) {
-            Drawer.gameCanvasWidth = (maze.mazeWidth * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
-            Drawer.gameCanvasHeight = (maze.mazeHeight * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
-            this.resize();
-            for (let x = 0; x < maze.mazeWidth; x++) {
-                for (let y = 0; y < maze.mazeHeight; y++) {
-                    this._drawRectangle(maze.grid[x][y]);
-                }
-            }
-            for (let i = 0; i < maze.listDoors.length; i++) {
-                if(!maze.listDoors[i].isOpen)
-                this._drawRectangle(maze.listDoors[i]);
-            }
-        }
-    }
-
-    drawPhysicalObject(obj: PhysicalObject) {
+    drawPhysicalObject(obj: PhysicalObject, renderer?: ObjectRenderer) {
         if(obj instanceof PhysicalCircle) {
-            this._drawCircle(obj);
+            this._drawCircle(obj, renderer);
         } else if(obj instanceof PhysicalRectangle) {
-            this._drawRectangle(obj);
+            this._drawRectangle(obj, renderer);
         }
-    }
-
-    drawClouds(player: Player) {
-        let maze = MazeGrid.getInstance();
-        let cloudRenderer = ObjectRenderer.cloud;
-        for (let x = 0; x < maze.listSquares.length; x++) {
-            let square = maze.listSquares[x]
-            /* if(player.listVisibleSquares.indexOf(square) != -1) {
-                color.opacity = 0;
-            } else  */if(square.hasBeenPassed) {
-                cloudRenderer.color.opacity = .9;
-            } else {
-                cloudRenderer.color.opacity = 1;
-            }
-            this._drawRectangle(maze.listSquares[x], cloudRenderer);
-        }
-        this.drawPlayerVisionCircle(player);
     }
 
     drawPlayerVisionCircle(player: Player) {

@@ -1,87 +1,72 @@
 import { MazeGrid } from "./model/maze-grid";
-import { Drawer } from "./renderer/drawer";
 import { IMazeGenerator } from "./algo/mazegen/mazegen-interface";
 import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
 import Vector from "./physics/objects/physical-vector";
 import { Game } from "./game/game";
 import { Constants } from "./utils/constants";
+import { GroundLayer } from "./physics/layers/ground-layer";
 
 export let v = Vector;
 export let mazeGrid = MazeGrid;
-export let game: Game = null;
+export let game = Game;
 export let constant = Constants;
 
 let mazeGenAlgo: IMazeGenerator;
-let groundLayerDrawer: Drawer = null;
+let groundLayer: GroundLayer = null;
 
 // GAME CONTROLLER
 let fpsInterval: number;
 
 export function init() {
-    initMaze();
 
-    groundLayerDrawer = new Drawer(Constants.groundLayerId);
-    groundLayerDrawer.drawMaze();
-    groundLayerDrawer.display();
-}
+    let gridWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
+    let gridHeightInput = <HTMLInputElement> document.getElementById("mapHeight");
 
-
-// MAZE INPUT
-
-export function initMaze() {
-    let _mapWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
-    let _mapHeightInput = <HTMLInputElement> document.getElementById("mapHeight");
-
-    MazeGrid.builder(_mapWidthInput.valueAsNumber, _mapHeightInput.valueAsNumber);
+    groundLayer = new GroundLayer(gridWidthInput.valueAsNumber, gridHeightInput.valueAsNumber);
     mazeGenAlgo = _getMazeGenAlgo();
+    groundLayer.render();
+
 }
 
 export function process() {
-    let mazeInstance = MazeGrid.getInstance();
-    if(mazeInstance.isFullyGenerated) {
-        // mazeInstance.resetMaze();
+    if(groundLayer.mazeGrid.isFullyGenerated) {
         mazeGenAlgo = _getMazeGenAlgo();
     }
-    console.time("mazeGen");
-    try {
-        while(!mazeInstance.isFullyGenerated) {
-            mazeGenAlgo.step();
-        }
-    } finally {
-        console.timeEnd("mazeGen");
+    while(!groundLayer.mazeGrid.isFullyGenerated) {
+        mazeGenAlgo.step();
     }
-    groundLayerDrawer.drawMaze();
+    groundLayer.render();
 }
 
 export function step() {
-    if(MazeGrid.getInstance() != null && mazeGenAlgo != null) {
-        if(mazeGenAlgo.isGenerationOver) {
+    if(groundLayer != null && mazeGenAlgo != null) {
+        if(groundLayer.mazeGrid.isFullyGenerated) {
             console.log("Maze is fully generated");
         } else {
             mazeGenAlgo.step();
-            groundLayerDrawer.drawMaze();
+            groundLayer.render()
         }
     }
 }
 
 export function solution() {
-    console.time("mazeSolution");
-    let solutionPath = MazeGrid.getInstance().getSolutionPath();
-    console.timeEnd("mazeSolution");
+    let solutionPath = groundLayer.mazeGrid.getSolutionPath();
     for (let i = 0; i < solutionPath.length; i++) {
         solutionPath[i].isInSolutionPath = true;
     }
-    groundLayerDrawer.drawMaze();
+    groundLayer.render();
 }
 
 function _getMazeGenAlgo(): IMazeGenerator {
-    let _algoGenInput = <HTMLInputElement> document.querySelector('input[name="algoInput"]:checked');
-    switch(_algoGenInput.value) {
-        case "build": 
-            return new BuildMazeGenerator();
-        case "bomb": 
-            return new BombMazeGenerator();
+    if(groundLayer.mazeGrid != null) {
+        let _algoGenInput = <HTMLInputElement> document.querySelector('input[name="algoInput"]:checked');
+        switch(_algoGenInput.value) {
+            case "build": 
+                return new BuildMazeGenerator(groundLayer.mazeGrid);
+            case "bomb": 
+                return new BombMazeGenerator(groundLayer.mazeGrid);
+        }
     }
 }
 
@@ -89,29 +74,26 @@ function _getMazeGenAlgo(): IMazeGenerator {
 // GAME INPUTS
 
 export function start() {
-    if(game != null) {
+    if(Game.getInstance() != null) {
         stop();
     }
-    game = new Game(groundLayerDrawer);
+    Game.instanciate(groundLayer);
     fpsInterval = setInterval(updateFrameId, 1000);
-    game.start();
+    Game.getInstance().start();
 }
 
 export function addEnemi() {
-    if(game != null) {
-        game.addEnemy();
-    }
+    Game.getInstance().addEnemy();
 }
 
 export function stop() {
-    game.end();
-    game = null;
+    Game.getInstance().end();
     clearInterval(fpsInterval);
 }
 
 function updateFrameId() {
     let frameIdInput = <HTMLInputElement> document.getElementById("framePerSecond");
-    frameIdInput.value = "" + game.fps;
+    frameIdInput.value = "" + Game.getInstance().fps;
 }
 
 (function() {

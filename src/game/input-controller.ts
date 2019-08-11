@@ -1,5 +1,6 @@
 import { Key } from 'ts-keycode-enum';
 import { Coordonate } from '../physics/utils/physical-tools';
+import Vector from '../physics/objects/physical-vector';
 
 export class InputController {
     
@@ -28,6 +29,16 @@ export class InputController {
 
     updateMousePosition(event: MouseEvent) {
         this.mousePosition = {x: event.pageX, y: event.pageY};
+    }
+
+    getVectorFromInputs() {
+        let deltaX = 0;
+        let deltaY = 0;
+        if(this.upPressed) deltaY--;
+        if(this.rightPressed) deltaX++; 
+        if(this.downPressed) deltaY++;
+        if(this.leftPressed) deltaX--;
+        return new Vector(deltaX, deltaY);
     }
 
     keyDownHandler(event: KeyboardEvent): void {

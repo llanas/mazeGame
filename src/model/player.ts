@@ -2,40 +2,26 @@ import PhysicalCircle from "../physics/objects/physical-circle";
 import { Position } from "../physics/utils/physical-tools";
 import Vector from "../physics/objects/physical-vector";
 import { Constants } from "../utils/constants";
-import Square from "./square";
-import { MazeGrid } from "./maze-grid";
 import { Bullet } from "./bullet";
 import { ObjectRenderer } from "../renderer/object-renderer";
+import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 
 export default class Player extends PhysicalCircle {
-    
 
     public speed: number;
     public visibilityRadius: number = Constants.playerVisibilityRadius;
-    public listVisibleSquares: Square[] = [];
     public detonationOnCooldown: boolean = false;
 
     constructor(position: Position) {
-        super(position, true, true, Constants.playerSize, ObjectRenderer.player);
-        this.sliding = true;
+        super(position, Constants.playerSize, CONST_COLIDING_PARAMETERS.PERSONNAGE_COLIDING, ObjectRenderer.player);
+        this.colidingParameters.sliding = true;
         this.speed = Constants.defaultPlayerSpeed;
-        this.listVisibleSquares = MazeGrid.getInstance().getStraightPathsFromPosition(position);
     }
 
-    move(movingVector: Vector) {
-        if(!movingVector.isZero()) {
-            let oldPositionGrid = this.position.gridPosition;
-            movingVector
-                .normalize()
-                .scale(this.speed)
-                .toFixed(2);
-            super.move(movingVector);
-            if(oldPositionGrid != this.position.gridPosition) {
-                MazeGrid.getInstance().getSquareByGridPosition(this.position.gridPosition.x, this.position.gridPosition.y).hasBeenPassed = true;
-                this.listVisibleSquares = MazeGrid.getInstance().getStraightPathsFromPosition(this.position);
-            }
-        }
+    getPositionAfterMove(vector: Vector = this.movingVector): Position {
+        return super.getPositionAfterMove(vector.normalize().scale(this.speed).toFixed(2));
     }
+
 
     fire(fireDirection: Position): Bullet | null {
         let newBullet = null;

@@ -3,7 +3,6 @@ const degrees = 180 / Math.PI;
 
 export default class Vector {
 
-
     private static random (min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }

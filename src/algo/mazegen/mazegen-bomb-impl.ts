@@ -1,6 +1,6 @@
 import { IMazeGenerator } from "./mazegen-interface";
 import { MazeGrid } from "../../model/maze-grid";
-import Square from "../../model/square";
+import { Square } from "../../model/square";
 import { Utils }  from "../../utils/utils";
 import Door from "../../model/door";
 
@@ -17,8 +17,8 @@ export default class BombMazeGenerator implements IMazeGenerator {
     mapNumber: Map<number, BombSquare>;
     listDoorsAvailable: Door[];
 
-    constructor() {
-        this.mazeGrid = MazeGrid.getInstance();
+    constructor(_mazeGrid: MazeGrid) {
+        this.mazeGrid = _mazeGrid;
         this.isGenerationOver = false;
         this.mapNumber = new Map();
         for (let i = 0; i < this.mazeGrid.listSquares.length; i++) {
@@ -35,10 +35,10 @@ export default class BombMazeGenerator implements IMazeGenerator {
         let doorInProgress = this.listDoorsAvailable[rand];
     
         let squareMin = (doorInProgress.isVertical) ? 
-            this.mazeGrid.getSquareByGridPosition(doorInProgress.position.gridPosition.x - 1, doorInProgress.position.gridPosition.y) : 
-            this.mazeGrid.getSquareByGridPosition(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y - 1);
+            this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x - 1, doorInProgress.position.gridPosition.y) : 
+            this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y - 1);
 
-        let squareMax = this.mazeGrid.getSquareByGridPosition(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y);
+        let squareMax = this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y);
 
         let minBomb = this.mapNumber.get(this.mapNumber.get(squareMin.number).bombNumber);
         let maxBomb = this.mapNumber.get(this.mapNumber.get(squareMax.number).bombNumber);

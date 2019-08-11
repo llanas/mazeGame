@@ -1,4 +1,4 @@
-import Square from "../model/square";
+import { Square } from "../model/square";
 import { MazeGrid } from "../model/maze-grid";
 import Door from "../model/door";
 
@@ -12,13 +12,12 @@ export class TreeNode {
     listPaths: Square[][] = [];
     numberMap: Map<number, Node>;
 
-    constructor() {
-        let maze = MazeGrid.getInstance();
-        if(maze.isFullyGenerated) {
-            this._initNumberMap(maze);
-            let squareADoorsOpen = maze.listSquares[0].getDoorsOpen();
+    constructor(mazeGrid: MazeGrid) {
+        if(mazeGrid.isFullyGenerated) {
+            this._initNumberMap(mazeGrid);
+            let squareADoorsOpen = mazeGrid.listSquares[0].getDoorsOpen();
             for (let i = 0; i < squareADoorsOpen.length; i++) {
-                this._getPathFromSquare(maze, maze.listSquares[0], [squareADoorsOpen[i]]);
+                this._getPathFromSquare(mazeGrid, mazeGrid.listSquares[0], [squareADoorsOpen[i]]);
             }
         } else {
             throw "Le labyrinthe n'est pas entièrement généré";

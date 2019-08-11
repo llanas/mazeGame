@@ -2,19 +2,28 @@ import { Drawer } from "../renderer/drawer";
 import Player from "../model/player";
 import { Constants } from "../utils/constants";
 import { GameUtils } from "./game-utils";
-import { MazeGrid } from "../model/maze-grid";
 import { InputController } from "./input-controller";
-import { PhysicalObject } from "../physics/objects/physical-object";
-import PhysicalUtils from "../physics/utils/physical-utils";
 import { DomUtils } from "../utils/dom-utils";
 import { Enemy } from "../model/enemy";
 import { Utils } from "../utils/utils";
 import { Position } from "../physics/utils/physical-tools";
+import { PlayerLayer } from "../physics/layers/player-layer";
+import { GroundLayer } from "../physics/layers/ground-layer";
+import { EnemiesLayer } from "../physics/layers/enemies-layer";
+import { UpperLayer } from "../physics/layers/upper-layer";
 
 export class Game {
 
+    private static gameInstance: Game;
+    public static getInstance() {
+        return Game.gameInstance;
+    }
+
+    public static instanciate(groundLayer: GroundLayer) {
+        Game.gameInstance = new Game(groundLayer);
+    }
+
     private _everySecondInterval: number;
-    private listPhysicalObjects: PhysicalObject[] = [];
 
     private _fps: number;
     public get fps() {
@@ -23,21 +32,22 @@ export class Game {
 
     private animationFrameId: number;
 
-    private groundLayer: Drawer;
-    private playerLayer: Drawer;
-    private upperLayer: Drawer;
+    private groundLayer: GroundLayer;
+    private playerLayer: PlayerLayer;
+    private enemiesLayer: EnemiesLayer;
+    private upperLayer: UpperLayer;
 
     private player: Player;
-    private maze: MazeGrid;
 
-    constructor(groundLayer: Drawer) {
-        this.maze = MazeGrid.getInstance();
-
+    private constructor(groundLayer: GroundLayer) {
         this.player = new Player(GameUtils.getPlayerStartPosition());
 
+        let playableLayer = new Drawer(Constants.playerLayerId);
+
         this.groundLayer = groundLayer;
-        this.playerLayer = new Drawer(Constants.playerLayerId);
-        this.upperLayer = new Drawer(Constants.upperLayerId);
+        this.playerLayer = new PlayerLayer(this.player, playableLayer);
+        this.enemiesLayer = new EnemiesLayer(playableLayer);
+        this.upperLayer = new UpperLayer(this.player, groundLayer.mazeGrid);
     }
     
     start() {
@@ -48,42 +58,40 @@ export class Game {
             this.updateFps(lastAnimationFrameId);
             lastAnimationFrameId = this.animationFrameId;
         }, 1000);
-        this.groundLayer.drawMaze();
-        this.groundLayer.display();
-        this.playerLayer.display();
-        this.upperLayer.display();
         this.render();
     }
 
     private update() {
-        PhysicalUtils.moveListOfObject(this.listPhysicalObjects);
+        this.player.movingVector = InputController.getInstance().getVectorFromInputs();
         if(InputController.getInstance().firePressed) {
-            let firePosition = this.playerLayer.getCanvasPositionFromWindowCoordonate(InputController.getInstance().mousePosition)
+            let firePosition = this.playerLayer.drawer.getCanvasPositionFromWindowCoordonate(InputController.getInstance().mousePosition)
             let newBullet = this.player.fire(firePosition);
-            if(newBullet != null) this.listPhysicalObjects.push(newBullet);
+            if(newBullet != null) this.playerLayer.add(newBullet);
         }
-        let inputVector = GameUtils.getVectorFromInputs();
-        this.player.move(inputVector);
-    
+        
+        this.playerLayer.moveAll(this.groundLayer, this.enemiesLayer);
+        this.enemiesLayer.moveAll(this.groundLayer, this.playerLayer);
+        
+        this.render();
+
         if(this.isGameOver()) {
             this.end();
             return;
         }
-    
-        this.render();
-        // Rendering
+
         this.animationFrameId = window.requestAnimationFrame(this.update.bind(this));
     }
 
     end() {
         window.cancelAnimationFrame(this.animationFrameId);
         clearInterval(this._everySecondInterval);
+        Game.gameInstance = null;
         alert("T'es meilleur que Joël!");
     }
 
     isGameOver() {
-        return this.player.position.x - this.player.radius >= (this.maze.mazeWidth - 1) * Constants.gridSquareSize
-            && this.player.position.y - this.player.radius >= (this.maze.mazeHeight - 1) * Constants.gridSquareSize;
+        return this.player.position.x - this.player.radius >= (this.groundLayer.mazeGrid.width - 1) * Constants.gridSquareSize
+            && this.player.position.y - this.player.radius >= (this.groundLayer.mazeGrid.height - 1) * Constants.gridSquareSize;
     }
 
     addEnemy() {
@@ -91,17 +99,14 @@ export class Game {
         let randomYPosition = (Utils.getRandomInt(Constants.mazeWidth) * Constants.gridSquareSize) + (Constants.gridSquareSize / 2);
 
         let newEnemy = new Enemy(new Position(randomXPosition, randomYPosition));
-        this.listPhysicalObjects.push(newEnemy);
+        this.enemiesLayer.add(newEnemy);
     }
 
     private render() {
-        this.playerLayer.clear();
-        this.upperLayer.clear();
-        for (let i = 0; i < this.listPhysicalObjects.length; i++) {
-            this.playerLayer.drawPhysicalObject(this.listPhysicalObjects[i]);
-        }
-        this.playerLayer.drawPhysicalObject(this.player);
-        this.upperLayer.drawClouds(this.player);
+        this.playerLayer.drawer.clear();
+        this.playerLayer.render();
+        this.enemiesLayer.render();
+        this.upperLayer.render();
     }
 
     private updateFps(lastAnimationFrameId: number) {

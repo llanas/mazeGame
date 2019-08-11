@@ -2,10 +2,10 @@ import Door from "./door";
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
 import { Constants } from "../utils/constants";
-import { Color } from "../utils/utils";
 import { ObjectRenderer } from "../renderer/object-renderer";
+import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 
-export default class Square extends PhysicalRectangle {
+export class Square extends PhysicalRectangle {
 
     public static listSquares: Square[] = [];
 
@@ -20,8 +20,8 @@ export default class Square extends PhysicalRectangle {
     bottomDoor: Door;
     leftDoor: Door;
 
-    constructor(_number: number, position: Position) {
-        super(position, false, false, Constants.gridSquareSize, Constants.gridSquareSize);
+    constructor(_number: number = 0, position: Position = new Position(0,0)) {
+        super(position, Constants.gridSquareSize, Constants.gridSquareSize, CONST_COLIDING_PARAMETERS.EMPTY_COLIDING, ObjectRenderer.squareBase);
 
         this.number = _number;
         this.isTreated = false;

@@ -4,14 +4,15 @@ import PhysicalCircle from "./physical-circle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
 import { ObjectRenderer } from "../../renderer/object-renderer";
+import { ColidingParameters } from "../utils/physical-parameters";
 
 export default class PhysicalRectangle extends PhysicalObject {
 
     width: number;
     height: number;
 
-    constructor(_position: Position, _movable: boolean, _coliding: boolean, _width: number, _height: number, _renderer?: ObjectRenderer) {
-        super(_position, _movable, _coliding);
+    constructor(_position: Position, _width: number, _height: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
+        super(_position, _colidingParameters, _renderer);
         this.width = _width;
         this.height = _height;
     }
