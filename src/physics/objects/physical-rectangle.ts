@@ -38,6 +38,57 @@ export default class PhysicalRectangle extends PhysicalObject {
         return isColliding;
     }
 
+    getVectorAfterBounce(position: Position, movingVector: Vector): Vector {
+        let minX = Math.min(this.position.x, this.position.x + this.width);
+        let maxX = Math.max(this.position.x, this.position.x + this.width);
+        let minY = Math.min(this.position.y, this.position.y + this.height);
+        let maxY = Math.max(this.position.y, this.position.y + this.height);
+
+        let newX = position.x + movingVector.x;
+        let newY = position.y + movingVector.y;
+
+        let side = 0;
+
+        if(minY > newY) side += 1; // Si top
+        if(maxX < newX) side += 2; // Si right
+        if(maxY < newY) side += 4; // Si bottom
+        if(minX > newX) side += 8; // Si left
+
+        switch(side) {
+            case 0:
+                throw "Incident de collision, le point est à l'intérieur du rectangle";
+            case 1: // Only TOP
+                movingVector.y = -movingVector.y;
+                break;
+            case 4: // BOTTOM ONLY
+                movingVector.y = -movingVector.y;
+                break;
+            case 2: // Only RIGHT
+                movingVector.x = -movingVector.x;
+                break;
+            case 8: // ONLY LEFT
+                movingVector.x = -movingVector.x;
+                break;
+            case 3: // TOP-RIGHT
+                movingVector.y = -movingVector.y;
+                movingVector.x = -movingVector.x;
+                break;
+            case 6: // RIGHT-BOTTOM
+                movingVector.y = -movingVector.y;
+                movingVector.x = -movingVector.x;
+                break;
+            case 12: // BOTTOM-LEFT
+                movingVector.y = -movingVector.y;
+                movingVector.x = -movingVector.x;
+                break;
+            case 9: // LEFT-TOP
+                movingVector.y = -movingVector.y;
+                movingVector.x = -movingVector.x;
+                break;
+        }
+        return movingVector;
+    }
+
     getVectorAfterSlide(position: Position, radius: number, movingVector: Vector): Vector {
 
         let minX = Math.min(this.position.x, this.position.x + this.width);

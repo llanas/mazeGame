@@ -23,11 +23,11 @@ export class PhysicalLayer {
                 
                 let listColidingObjects: PhysicalObject[] = [];
                 for (let y = 0; y < colidingLayers.length; y++) {
-                    listColidingObjects = colidingLayers[y].getColidingObjects(movingObject, positionAfterMove);
+                    listColidingObjects.push(... colidingLayers[y].getColidingObjects(movingObject, positionAfterMove));
                 }
                 if(listColidingObjects.length != 0) {
                     for (let z = 0; z < listColidingObjects.length; z++) {
-                        movingObject.colidingWith(listColidingObjects[i]);
+                        movingObject.colidingWith(listColidingObjects[z]);
                     }
                 }
                 this.move(movingObject);

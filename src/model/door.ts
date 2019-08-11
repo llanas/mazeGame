@@ -37,7 +37,7 @@ export default class Door extends PhysicalRectangle {
     open(): void {
         if (this.isOpenable) {
             this.isOpen = true;
-            this.colidingParameters.coliding = false;
+            this.colidingParameters = CONST_COLIDING_PARAMETERS.EMPTY_COLIDING;
         }
     }
 }

@@ -1,6 +1,7 @@
 import { Key } from 'ts-keycode-enum';
 import { Coordonate } from '../physics/utils/physical-tools';
 import Vector from '../physics/objects/physical-vector';
+import { DomUtils } from '../utils/dom-utils';
 
 export class InputController {
     
@@ -71,5 +72,6 @@ export class InputController {
         } else if(event.keyCode === Key.UpArrow || event.keyCode === Key.Z) {
             this.upPressed = false;
         }
+        DomUtils.removeAllFocus();
     }
 }

@@ -5,9 +5,13 @@ import { Constants } from "../utils/constants";
 import { Bullet } from "./bullet";
 import { ObjectRenderer } from "../renderer/object-renderer";
 import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
+import { ILiving } from "./living/living-interface";
+import { PhysicalObject } from "../physics/objects/physical-object";
+import { Enemy } from "./enemy";
 
-export default class Player extends PhysicalCircle {
-
+export default class Player extends PhysicalCircle implements ILiving {
+    
+    life: number = 200;
     public speed: number;
     public visibilityRadius: number = Constants.playerVisibilityRadius;
     public detonationOnCooldown: boolean = false;
@@ -22,7 +26,6 @@ export default class Player extends PhysicalCircle {
         return super.getPositionAfterMove(vector.normalize().scale(this.speed).toFixed(2));
     }
 
-
     fire(fireDirection: Position): Bullet | null {
         let newBullet = null;
         if(!this.detonationOnCooldown) {
@@ -32,5 +35,19 @@ export default class Player extends PhysicalCircle {
             this.detonationOnCooldown = true;
         }
         return newBullet;
+    }
+
+    colidingWith(objectColidingWith: PhysicalObject) {
+        if(objectColidingWith instanceof Enemy) {
+            this.damaging(50);
+        }
+        super.colidingWith(objectColidingWith);
+    }
+
+    damaging(damageAmount: number): void {
+        this.life -= damageAmount;
+        if(this.life <= 0) {
+            this.destroy();
+        }
     }
 }

@@ -17,9 +17,13 @@ export class Constants {
     static playerVisibilityRadius = Constants.gridSquareSize * 5;
     static playerFireDetonationCooldown = 200;
 
+    // ENEMIES
+    static enemiesPopingInterval = 2000;
+
     //WEAPONS
-    static bulletSize = Constants.gridSquareSize / 15;
+    static bulletSize = Constants.gridSquareSize / 10;
     static bulletSpeed = Constants.gridSquareSize / 5;
+    static bulletDamage = 50;
 
     // MOVING
     static sliding_marge = 2;

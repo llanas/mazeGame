@@ -24,6 +24,7 @@ export class Game {
     }
 
     private _everySecondInterval: number;
+    private _enemiesPopingInterval: number;
 
     private _fps: number;
     public get fps() {
@@ -58,6 +59,7 @@ export class Game {
             this.updateFps(lastAnimationFrameId);
             lastAnimationFrameId = this.animationFrameId;
         }, 1000);
+        this._enemiesPopingInterval = setInterval(() => this.addEnemy(), Constants.enemiesPopingInterval);
         this.render();
     }
 
@@ -86,12 +88,11 @@ export class Game {
         window.cancelAnimationFrame(this.animationFrameId);
         clearInterval(this._everySecondInterval);
         Game.gameInstance = null;
-        alert("T'es meilleur que Joël!");
+        alert("T'AS MOURU !!");
     }
 
     isGameOver() {
-        return this.player.position.x - this.player.radius >= (this.groundLayer.mazeGrid.width - 1) * Constants.gridSquareSize
-            && this.player.position.y - this.player.radius >= (this.groundLayer.mazeGrid.height - 1) * Constants.gridSquareSize;
+        return this.player.life <= 0;
     }
 
     addEnemy() {

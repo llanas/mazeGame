@@ -4,6 +4,7 @@ import { Drawer } from "../../renderer/drawer";
 import Player from "../../model/player";
 import { ObjectRenderer } from "../../renderer/object-renderer";
 import { MazeGrid } from "../../model/maze-grid";
+import { Game } from "../../game/game";
 
 export class UpperLayer extends PhysicalLayer {
 
@@ -30,5 +31,8 @@ export class UpperLayer extends PhysicalLayer {
             this.drawer.drawPhysicalObject(this.mazeGrid.listSquares[x], cloudRenderer);
         }
         this.drawer.drawPlayerVisionCircle(this.player);
+        this.drawer.context.font = "20px serif";
+        this.drawer.context.fillStyle = Constants.playerColor.rgbValue;
+        this.drawer.context.fillText(Game.getInstance().fps + " fps", (Constants.mazeWidth - 1) * Constants.gridSquareSize, 50);
     }
 }
