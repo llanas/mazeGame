@@ -14,9 +14,12 @@ export default class Player extends PhysicalCircle {
     }
 
     move(movingVector: Vector) {
-        movingVector
-            .normalize()
-            .scale(this.speed);
-        super.move(movingVector);
+        if(!movingVector.isZero()) {
+            movingVector
+                .normalize()
+                .scale(this.speed)
+                .toFixed(2);
+            super.move(movingVector);
+        }
     }
 }

@@ -3,6 +3,7 @@ import { Position, Coordonate, Direction } from "../utils/physical-tools";
 import PhysicalCircle from "./physical-circle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
+import { Constants } from "../../utils/constants";
 
 export default class PhysicalRectangle extends PhysicalObject {
 
@@ -53,7 +54,10 @@ export default class PhysicalRectangle extends PhysicalObject {
         if(maxY < newY) side += 4; // Si bottom
         if(minX > newX) side += 8; // Si left
 
-        let movingAngle = movingVector.angleDeg();
+        let angle = movingVector.angleDeg();
+
+        let deltaY: number;
+        let deltaX: number;
 
         switch(side) {
             case 0:
@@ -61,34 +65,182 @@ export default class PhysicalRectangle extends PhysicalObject {
             case 1: // Only TOP
                 movingVector.y = 0;
                 break;
+            case 4: // BOTTOM ONLY
+                movingVector.y = 0;
+                break;
             case 2: // Only RIGHT
                 movingVector.x = 0;
                 break;
-            case 4: // Only BOTTOM
-                movingVector.y = 0;
-                break;
-            case 8: // Only LEFT
+            case 8: // ONLY LEFT
                 movingVector.x = 0;
                 break;
             case 3: // TOP-RIGHT
-                if(movingAngle === -45) movingVector.x++;
-                else if(movingAngle < -45) movingVector.x;
-                else movingVector.y = 0;
+                if(angle < 135 && angle >= 90) {
+                    // On descend à 90
+                    if(maxX + radius >= newX) {
+                        movingVector.x = 1;
+                        movingVector.y = 0;
+                    } else {
+                        movingVector.x = 0;
+                    }
+                } else if(angle > 135) {
+                    // On va a gauche 180
+                    if(minY - radius <= newY) {
+                        movingVector.y = -1;
+                        movingVector.x = 0;
+                    } else {
+                        movingVector.y = 0;
+                    }
+                } else if(angle === 135) {
+                    deltaX = Math.abs(newX - maxX);
+                    deltaY = Math.abs(newY - minY);
+                    if(deltaX > deltaY) {
+                        // On descend à 90
+                        if(maxX + radius >= newX) {
+                            movingVector.x = 1;
+                            movingVector.y = 0;
+                        } else {
+                            movingVector.x = 0;
+                        }
+                    } else {
+                        // On va a gauche 180
+                        if(minY - radius <= newY) {
+                            movingVector.y = -1;
+                            movingVector.x = 0;
+                        } else {
+                            movingVector.y = 0;
+                        }
+                    }
+                }
                 break;
             case 6: // RIGHT-BOTTOM
-                if(movingAngle === 45) movingVector.x++;
-                else if(movingAngle > 45) movingVector.x = 0;
-                else movingVector.y = 0;
+                if(angle <= -90 && angle > -135) {
+                    // On monte à -90
+                    if(maxX + radius >= newX) {
+                        // on se décale à droite
+                        movingVector.x = 1;
+                        movingVector.y = 0;
+                    } else {
+                        movingVector.x = 0;
+                    }
+                } else if(angle < -135 || angle === 180) {
+                    // On va à gauche 180
+                    if(maxY + radius >= newY) {
+                        // On se décale vers le bas
+                        movingVector.y = 1;
+                        movingVector.x = 0;
+                    } else {
+                        movingVector.y = 0;
+                    }
+                } else if(angle === -135) {
+                    deltaX = Math.abs(newX - maxX);
+                    deltaY = Math.abs(newY - maxY);
+                    if(deltaX > deltaY) {
+                        // On monte à -90
+                        if(maxX + radius >= newX) {
+                            // on se décale à droite
+                            movingVector.x = 1;
+                            movingVector.y = 0;
+                        } else {
+                            movingVector.x = 0;
+                        }
+                    } else {
+                        // On va à gauche 180
+                        if(maxY + radius >= newY) {
+                            // On se décale vers le bas
+                            movingVector.y = 1;
+                            movingVector.x = 0;
+                        } else {
+                            movingVector.y = 0;
+                        }
+                    }
+                }
                 break;
             case 12: // BOTTOM-LEFT
-                if(movingAngle === 135) movingVector.x--;
-                if(movingAngle < 135) movingVector.x = 0;
-                else movingVector.y = 0;
+                if(angle < -45 && angle >= -90) {
+                    // On monte à -90
+                    if(minX - radius <= newX) {
+                        // On se décale à gauche
+                        movingVector.x = -1;
+                        movingVector.y = 0;
+                    } else {
+                        movingVector.x = 0;
+                    }
+                } else if(angle > -45 && angle <= 0) {
+                    // On va à droite 0
+                    if(maxY + radius >= newY) {
+                        // On se décale vers le bas
+                        movingVector.y = 1;
+                        movingVector.x = 0
+                    } else {
+                        movingVector.y = 0;
+                    }
+                } else if(angle === -45) {
+                    deltaX = Math.abs(newX - minX);
+                    deltaY = Math.abs(newY - maxY);
+                    if(deltaX > deltaY) {
+                        // On monte à -90
+                        if(minX - radius <= newX) {
+                            // On se décale à gauche
+                            movingVector.x = -1;
+                            movingVector.y = 0;
+                        } else {
+                            movingVector.x = 0;
+                        }
+                    } else {
+                        // On va à droite 0
+                        if(maxY + radius >= newY) {
+                            // On se décale vers le bas
+                            movingVector.y = 1;
+                            movingVector.x = 0
+                        } else {
+                            movingVector.y = 0;
+                        }
+                    }
+                }
                 break;
             case 9: // LEFT-TOP
-                if(movingAngle === -135) movingVector.x--;
-                if(movingAngle > -135) movingVector.x = 0;
-                else movingVector.y = 0;
+                if(angle > 45 && angle <= 90) {
+                    // On descend 90
+                    if(minX - radius <= newX) {
+                        // On décale à gauche
+                        movingVector.x = -1;
+                        movingVector.y = 0;
+                    } else {
+                        movingVector.x = 0;
+                    }
+                } else if(angle < 45 && angle >= 0) {
+                    // On va à droite 0
+                    if(minY - radius <= newY) {
+                        // On se décale vers le haut
+                        movingVector.y = -1;
+                        movingVector.x = 0;
+                    } else {
+                        movingVector.y = 0;
+                    }
+                } else if(angle === 45) {
+                    deltaX = Math.abs(newX - minX);
+                    deltaY = Math.abs(newY - minY);
+                    if(deltaX > deltaY) {
+                        // On descend 90
+                        if(minX - radius <= newX) {
+                            // On décale à gauche
+                            movingVector.x = -1;
+                            movingVector.y = 0;
+                        } else {
+                            movingVector.x = 0;
+                        }
+                    } else {
+                        // On va à droite 0
+                        if(minY - radius <= newY) {
+                            // On se décale vers le haut
+                            movingVector.y = -1;
+                            movingVector.x = 0;
+                        } else {
+                            movingVector.y = 0;
+                        }
+                    }
+                }
                 break;
         }
         return movingVector;

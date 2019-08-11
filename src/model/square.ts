@@ -1,9 +1,7 @@
 import Door from "./door";
 import { Position } from "../physics/utils/physical-tools";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
-
-const squareWidth = 30;
-const squareHeight = 30;
+import { Constants } from "../utils/constants";
 
 export default class Square extends PhysicalRectangle {
 
@@ -20,7 +18,7 @@ export default class Square extends PhysicalRectangle {
     leftDoor: Door;
 
     constructor(_number: number, position: Position) {
-        super(position, false, false, squareWidth, squareHeight);
+        super(position, false, false, Constants.gridSquareSize, Constants.gridSquareSize);
 
         this.number = _number;
         this.isTreated = false;

@@ -1,4 +1,4 @@
-import Constants from "../../utils/constants";
+import { Constants } from "../../utils/constants";
 import PhysicsUtils from "./physical-utils";
 import Vector from "../objects/physical-vector";
 

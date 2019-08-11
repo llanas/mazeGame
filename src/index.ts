@@ -1,92 +1,33 @@
 import MazeGrid from "./model/maze-grid";
-import Drawer from "./utils/drawer";
+import Drawer from "./game/drawer";
 import IMazeGenerator from "./algo/mazegen/mazegen-interface";
 import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
 import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
 import TreeNode from "./model/treeNode";
-import GameController from "./controls/game-controller";
-import Player from "./model/player";
-import { Position } from "./physics/utils/physical-tools";
 import Vector from "./physics/objects/physical-vector";
+import { Game } from "./game/game";
+import { Constants } from "./utils/constants";
 
 export let v = Vector;
 export let maze: MazeGrid = null;
+export let game: Game = null;
 
 let mazeGenAlgo: IMazeGenerator;
-let drawer: Drawer = null;
-
-let player: Player = null;
+let groundLayerDrawer: Drawer = null;
 
 // GAME CONTROLLER
-let gameController: GameController = null;
-let animationFrameId: number = null;
-let lastAnimationFrameId: number = 0;
 let fpsInterval: number;
 
 export function init() {
     initMaze();
 
-    drawer = new Drawer("map");
-    drawer.drawMaze(maze);
-    drawer.display();
+    groundLayerDrawer = new Drawer(Constants.groundLayerId);
+    groundLayerDrawer.drawMaze(maze);
+    groundLayerDrawer.display();
 }
 
-export function start() {
-    fpsInterval = setInterval(updateFrameId, 1000);
-    if(animationFrameId == null) {
-        gameController = new GameController();
-        player = new Player(new Position(10, 10));
-        render();
-        animationFrameId = window.requestAnimationFrame(update);
-    }
-}
 
-function update(timeStamp: DOMHighResTimeStamp) {
-    let deltaX = 0;
-    let deltaY = 0;
-    if(gameController.upPressed) deltaY--;
-    if(gameController.rightPressed) deltaX++; 
-    if(gameController.downPressed) deltaY++;
-    if(gameController.leftPressed) deltaX--;
-
-    if(deltaX !== 0 || deltaY !== 0) {
-        let playerMovingVector = new Vector(deltaX, deltaY);
-        player.move(playerMovingVector);
-    }
-
-    if(player.position.gridPosition.x === maze.mazeWidth - 1 && player.position.gridPosition.y === maze.mazeHeight - 1) {
-        stop();
-        alert("YOU WIN BATARD !");
-        return;
-    }
-
-    render();
-    // Rendering
-    animationFrameId = window.requestAnimationFrame(update);
-}
-
-export function stop() {
-    window.cancelAnimationFrame(animationFrameId);
-    gameController = null;
-    player = null;
-    animationFrameId = null;
-    lastAnimationFrameId = 0;
-    clearInterval(fpsInterval);
-}
-
-function updateFrameId() {
-    let deltaFrame = animationFrameId - lastAnimationFrameId;
-    lastAnimationFrameId = animationFrameId;
-    let frameIdInput = <HTMLInputElement> document.getElementById("framePerSecond");
-    frameIdInput.value = "" + deltaFrame;
-}
-
-function render() {
-    drawer.clear();
-    drawer.drawMaze(maze);
-    drawer.drawPlayer(player);
-}
-
+// MAZE INPUT
 
 export function initMaze() {
     let _mapWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
@@ -110,7 +51,7 @@ export function process() {
         } finally {
             console.timeEnd("mazeGen");
         }
-        drawer.drawMaze(maze);
+        groundLayerDrawer.drawMaze(maze);
     }
 }
 
@@ -120,7 +61,7 @@ export function step() {
             console.log("Maze is fully generated");
         } else {
             mazeGenAlgo.step();
-            drawer.drawMaze(maze);
+            groundLayerDrawer.drawMaze(maze);
         }
     }
 }
@@ -133,7 +74,7 @@ export function solution() {
     for (let i = 0; i < solutionPath.length; i++) {
         solutionPath[i].isInSolutionPath = true;
     }
-    drawer.drawMaze(maze);
+    groundLayerDrawer.drawMaze(maze);
 }
 
 function _getMazeGenAlgo(): IMazeGenerator {
@@ -144,4 +85,27 @@ function _getMazeGenAlgo(): IMazeGenerator {
         case "bomb": 
             return new BombMazeGenerator(maze);
     }
+}
+
+
+// GAME INPUTS
+
+export function start() {
+    if(game != null) {
+        stop();
+    }
+    game = new Game(groundLayerDrawer, maze);
+    fpsInterval = setInterval(updateFrameId, 1000);
+    game.start();
+}
+
+export function stop() {
+    game.end();
+    game = null;
+    clearInterval(fpsInterval);
+}
+
+function updateFrameId() {
+    let frameIdInput = <HTMLInputElement> document.getElementById("framePerSecond");
+    frameIdInput.value = "" + game.fps;
 }
