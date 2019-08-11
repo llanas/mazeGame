@@ -1,8 +1,9 @@
-import MazeGrid from "../model/maze-grid";
+import { MazeGrid } from "../model/maze-grid";
 import Square from "../model/square";
 import Door from "../model/door";
 import Player from "../model/player";
 import { Constants } from "../utils/constants";
+import { Color, Utils } from "../utils/utils";
 
 export default class Drawer {
 
@@ -35,18 +36,19 @@ export default class Drawer {
         this.canvas.height = height;
     }
 
-    drawMaze(_mazeGrid: MazeGrid): void {
-        if(_mazeGrid != null && _mazeGrid.grid.length != 0) {
-            Drawer.gameCanvasWidth = (_mazeGrid.mazeWidth * Constants.gridSquareSize);
-            Drawer.gameCanvasHeight = (_mazeGrid.mazeHeight * Constants.gridSquareSize);
+    drawMaze(): void {
+        let maze = MazeGrid.getInstance();
+        if(maze != null && maze.grid.length != 0) {
+            Drawer.gameCanvasWidth = (maze.mazeWidth * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
+            Drawer.gameCanvasHeight = (maze.mazeHeight * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
             this.resize();
-            for (let x = 0; x < _mazeGrid.mazeWidth; x++) {
-                for (let y = 0; y < _mazeGrid.mazeHeight; y++) {
-                    this.drawSquare(_mazeGrid.grid[x][y]);
+            for (let x = 0; x < maze.mazeWidth; x++) {
+                for (let y = 0; y < maze.mazeHeight; y++) {
+                    this.drawSquare(maze.grid[x][y]);
                 }
             }
-            for (let i = 0; i < _mazeGrid.listDoors.length; i++) {
-                this.drawDoor(_mazeGrid.listDoors[i]);
+            for (let i = 0; i < maze.listDoors.length; i++) {
+                this.drawDoor(maze.listDoors[i]);
             }
         }
     }
@@ -58,8 +60,34 @@ export default class Drawer {
         this.context.fill();
     }
 
-    drawSquare(_square: Square): void {
-        this.context.fillStyle = _square.getColor();
+    drawClouds(player: Player) {
+        let maze = MazeGrid.getInstance();
+        let color = Constants.cloudColor;
+        for (let x = 0; x < maze.listSquares.length; x++) {
+            let square = maze.listSquares[x]
+            /* if(player.listVisibleSquares.indexOf(square) != -1) {
+                color.opacity = 0;
+            } else  */if(square.hasBeenPassed) {
+                color.opacity = .9;
+            } else {
+                color.opacity = 1;
+            }
+            this.drawSquare(maze.listSquares[x], color);
+        }
+        this.drawPlayerVisionCircle(player);
+    }
+
+    drawPlayerVisionCircle(player: Player) {
+        this.context.save();
+        this.context.globalCompositeOperation = 'destination-out';
+        this.context.beginPath();
+        this.context.arc(player.position.x, player.position.y, player.visibilityRadius, 0, 2 * Math.PI);
+        this.context.fill();
+        this.context.restore();
+    }
+
+    drawSquare(_square: Square, color?: Color): void {
+        this.context.fillStyle = (color) ? color.rgbValue : _square.getColor().rgbValue;
         this.context.fillRect(_square.position.x, _square.position.y, _square.width, _square.height);
     }
 

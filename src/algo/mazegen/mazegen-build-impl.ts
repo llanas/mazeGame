@@ -1,7 +1,7 @@
-import IMazeGenerator from "./mazegen-interface";
-import MazeGrid from "../../model/maze-grid";
+import { IMazeGenerator } from "./mazegen-interface";
+import { MazeGrid } from "../../model/maze-grid";
 import Square from "../../model/square";
-import Utils from "../../utils/utils";
+import { Utils } from "../../utils/utils";
 import Door from "../../model/door";
 
 export default class BuildMazeGenerator implements IMazeGenerator {
@@ -11,8 +11,8 @@ export default class BuildMazeGenerator implements IMazeGenerator {
 
     squareTreatedPool: Square[];
 
-    constructor(_mazeGrid: MazeGrid) {
-        this.mazeGrid = _mazeGrid;
+    constructor() {
+        this.mazeGrid = MazeGrid.getInstance();
         this.isGenerationOver = false;
         this.squareTreatedPool = [];
     }

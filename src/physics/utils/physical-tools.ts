@@ -43,6 +43,11 @@ export class Position implements Coordonate {
         let newY = Number((speed * Math.sin(PhysicsUtils.toRadian(direction.angle))).toFixed(2));
         return new Position(this.x + newX, this.y + newY);
     }
+
+    isInSameLine(position: Position): boolean {
+        return this.gridPosition.x === position.gridPosition.x 
+            || this.gridPosition.y === position.gridPosition.y; 
+    }
 }
 
 export class Direction {

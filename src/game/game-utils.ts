@@ -1,5 +1,7 @@
 import { InputController } from "./imput-controller";
 import Vector from "../physics/objects/physical-vector";
+import { Position } from "../physics/utils/physical-tools";
+import { Constants } from "../utils/constants";
 
 export class GameUtils {
 
@@ -11,5 +13,9 @@ export class GameUtils {
         if(InputController.getInstance().downPressed) deltaY++;
         if(InputController.getInstance().leftPressed) deltaX--;
         return new Vector(deltaX, deltaY);
+    }
+
+    static getPlayerStartPosition(): Position {
+        return new Position(Constants.gridSquareSize / 2, Constants.gridSquareSize / 2);
     }
 }

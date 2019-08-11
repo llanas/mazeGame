@@ -1,4 +1,4 @@
-import MazeGrid from "../model/maze-grid";
+import { MazeGrid } from "../model/maze-grid";
 import Square from "../model/square";
 import Door from "../model/door";
 import Player from "../model/player";
@@ -50,7 +50,7 @@ export default class Drawer {
     }
 
     drawSquare(_square: Square): void {
-        this.context.fillStyle = _square.getColor();
+        this.context.fillStyle = _square.getColor().rgbValue;
         this.context.fillRect(_square.position.x, _square.position.y, squareSize, squareSize);
     }
 

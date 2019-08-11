@@ -1,68 +1,56 @@
 import Square from "./square";
 import Door from "./door";
 import { Position } from "../physics/utils/physical-tools";
-import PhysicalCircle from "../physics/objects/physical-circle";
 import PhysicalObject from "../physics/objects/physical-object";
+import { TreeNode } from "./treeNode";
 
-export default class MazeGrid {
+export class MazeGrid {
+
+    private static instance: MazeGrid;
+
+    static getInstance(): MazeGrid {
+        if(MazeGrid.instance != null && MazeGrid.instance != undefined) {
+            return MazeGrid.instance;
+        } else {
+            throw "Aucune instance de MazeGrid";
+        }
+    }
+
+    static builder(_mazeWidth: number, _mazeHeight: number) {
+        MazeGrid.instance = new MazeGrid(_mazeWidth, _mazeHeight);
+    }
     
     public mazeWidth: number;
     public mazeHeight: number;
     public grid: Square[][] = [];
-    public isFullyGenerated: boolean = false;
 
     public listSquares: Square[] = [];
     public listDoors: Door[] = [];
+    
+    private _treeNode: TreeNode;
+    private _isFullyGenerated: boolean = false;
 
-    resetMaze() {
-        this.listSquares = [];
-        this.listDoors = [];
-        this.grid = [];
-        this.isFullyGenerated = false;
-        PhysicalObject.gridObjects = [];
-        
-        this.generateGrid();
-        this.generateDoors();
-    }
-
-    constructor(_mazeWidth: number, _mazeHeight: number) {
+    private constructor(_mazeWidth: number, _mazeHeight: number) {
         this.mazeWidth = _mazeWidth;
         this.mazeHeight = _mazeHeight;
 
-        this.generateGrid();
-        this.generateDoors();
+        this._generateGrid();
+        this._generateDoors();
     }
 
-    private generateGrid(): void {
-        for(let x = 0; x < this.mazeWidth; x++) {
-            let colomn: Square[] = [];
-            this.grid.push(colomn);
-            for(let y = 0; y < this.mazeHeight; y++) {
-                let square = this._buildSquare(x, y);
-                colomn.push(square);
-            }
-        }
-        PhysicalObject.buildGridObjects(this.mazeWidth, this.mazeHeight);
+    static resetMaze() {
+        PhysicalObject.gridObjects = [];
+        // MazeGrid.instance = new MazeGrid()
     }
 
-    private generateDoors() {
-        for (let i = 0; i < this.listSquares.length; i++) {
-            const square = this.listSquares[i];
+    getStraightPathsFromPosition(position: Position): Square[] {
+        let square = this.getSquareByGridPosition(position.gridPosition.x, position.gridPosition.y);
+        return this._treeNode.getStraightPathFromSquare(square);
+    } 
 
-            if(square.position.y !== 0) {
-                square.topDoor = this.getSquareByPosition(square.number - 1).bottomDoor;
-            } else {
-                square.topDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, false, false);
-            }
-
-            if(square.position.x !== 0) {
-                square.leftDoor = this.getSquareByPosition(square.number - this.mazeHeight).rightDoor;
-            } else {
-                square.leftDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, true, false);
-            }
-
-            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.mazeWidth - 1);
-            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.mazeHeight - 1);
+    getSolutionPath(): Square[] {
+        if(this.isFullyGenerated) {
+            return this._treeNode.getPathToSquare(this.listSquares[this.listSquares.length - 1]);
         }
     }
 
@@ -118,6 +106,51 @@ export default class MazeGrid {
                 break;
             default:
                 throw `Impossible d'ouvrir la porte, les cases n°${squareMin.position} et n°${squareMax.position} ne sont pas adjacentes`;
+        }
+    }
+
+    // GETTEURS SETTEURS
+    public get isFullyGenerated(): boolean {
+        return this._isFullyGenerated;
+    }
+    public set isFullyGenerated(value: boolean) {
+        this._isFullyGenerated = value;
+        if(value) {
+            this._treeNode = new TreeNode();
+        }
+    }
+
+    // METHODES PRIVATE
+    private _generateGrid(): void {
+        for(let x = 0; x < this.mazeWidth; x++) {
+            let colomn: Square[] = [];
+            this.grid.push(colomn);
+            for(let y = 0; y < this.mazeHeight; y++) {
+                let square = this._buildSquare(x, y);
+                colomn.push(square);
+            }
+        }
+        PhysicalObject.buildGridObjects(this.mazeWidth, this.mazeHeight);
+    }
+
+    private _generateDoors() {
+        for (let i = 0; i < this.listSquares.length; i++) {
+            const square = this.listSquares[i];
+
+            if(square.position.y !== 0) {
+                square.topDoor = this.getSquareByPosition(square.number - 1).bottomDoor;
+            } else {
+                square.topDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, false, false);
+            }
+
+            if(square.position.x !== 0) {
+                square.leftDoor = this.getSquareByPosition(square.number - this.mazeHeight).rightDoor;
+            } else {
+                square.leftDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, true, false);
+            }
+
+            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.mazeWidth - 1);
+            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.mazeHeight - 1);
         }
     }
 

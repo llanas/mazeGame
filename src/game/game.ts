@@ -1,10 +1,8 @@
-import { InputController } from "./imput-controller";
 import Drawer from "./drawer";
 import Player from "../model/player";
-import { Position } from "../physics/utils/physical-tools";
 import { Constants } from "../utils/constants";
 import { GameUtils } from "./game-utils";
-import MazeGrid from "../model/maze-grid";
+import { MazeGrid } from "../model/maze-grid";
 
 export class Game {
 
@@ -25,10 +23,10 @@ export class Game {
     private player: Player;
     private maze: MazeGrid;
 
-    constructor(groundLayer: Drawer, _maze: MazeGrid) {
-        this.maze = _maze;
+    constructor(groundLayer: Drawer) {
+        this.maze = MazeGrid.getInstance();
 
-        this.player = new Player(new Position(10, 10));
+        this.player = new Player(GameUtils.getPlayerStartPosition());
 
         this.groundLayer = groundLayer;
         this.playerLayer = new Drawer(Constants.playerLayerId);
@@ -42,12 +40,11 @@ export class Game {
             this.updateFps(lastAnimationFrameId);
             lastAnimationFrameId = this.animationFrameId;
         }, 1000);
-        this.groundLayer.drawMaze(this.maze);
+        this.groundLayer.drawMaze();
         this.groundLayer.display();
-        this.playerLayer.drawPlayer(this.player);
         this.playerLayer.display();
+        this.upperLayer.display();
         this.render();
-
     }
 
     private update() {
@@ -75,7 +72,9 @@ export class Game {
 
     private render() {
         this.playerLayer.clear();
+        this.upperLayer.clear();
         this.playerLayer.drawPlayer(this.player);
+        this.upperLayer.drawClouds(this.player);
     }
 
     updateFps(lastAnimationFrameId: number) {

@@ -2,7 +2,7 @@ export class InputController {
     
     private static instance: InputController;
 
-    static getInstance() {
+    static getInstance(): InputController {
         if(!InputController.instance) {
             InputController.instance = new InputController();
         } 

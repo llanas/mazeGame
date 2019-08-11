@@ -1,7 +1,7 @@
-import IMazeGenerator from "./mazegen-interface";
-import MazeGrid from "../../model/maze-grid";
+import { IMazeGenerator } from "./mazegen-interface";
+import { MazeGrid } from "../../model/maze-grid";
 import Square from "../../model/square";
-import Utils from "../../utils/utils";
+import { Utils }  from "../../utils/utils";
 import Door from "../../model/door";
 
 interface BombSquare {
@@ -17,8 +17,8 @@ export default class BombMazeGenerator implements IMazeGenerator {
     mapNumber: Map<number, BombSquare>;
     listDoorsAvailable: Door[];
 
-    constructor(_mazeGrid: MazeGrid) {
-        this.mazeGrid = _mazeGrid;
+    constructor() {
+        this.mazeGrid = MazeGrid.getInstance();
         this.isGenerationOver = false;
         this.mapNumber = new Map();
         for (let i = 0; i < this.mazeGrid.listSquares.length; i++) {
@@ -26,7 +26,7 @@ export default class BombMazeGenerator implements IMazeGenerator {
             let bombSquare = {bombNumber: squareInProgress.number, listSquaresLinked : [squareInProgress]} as BombSquare;
             this.mapNumber.set(squareInProgress.number, bombSquare);
         }
-        this.listDoorsAvailable = _mazeGrid.listDoors.filter(door => door.isOpenable);
+        this.listDoorsAvailable = this.mazeGrid.listDoors.filter(door => door.isOpenable);
     }
 
     step(): void {
