@@ -1,10 +1,10 @@
-import { PhysicalObject } from "./physical-object";
-import { Position, Coordonate } from "../utils/physical-tools";
-import PhysicalCircle from "./physical-circle";
-import PhysicsUtils from "../utils/physical-utils";
-import Vector from "./physical-vector";
 import { ObjectRenderer } from "../../renderer/object-renderer";
 import { ColidingParameters } from "../utils/physical-parameters";
+import { Coordonate, Position } from "../utils/physical-tools";
+import PhysicsUtils from "../utils/physical-utils";
+import PhysicalCircle from "./physical-circle";
+import { PhysicalObject } from "./physical-object";
+import Vector from "./physical-vector";
 
 export default class PhysicalRectangle extends PhysicalObject {
 
@@ -17,6 +17,18 @@ export default class PhysicalRectangle extends PhysicalObject {
         this.height = _height;
     }
 
+    
+    public get center() : Position {
+        return new Position(this.position.x + (this.width / 2), this.position.y + (this.height / 2));
+    }
+    
+    public get normals() : Vector[] {
+        return [
+            new Vector(this.position.x + this.width, this.position.y).subtract(new Vector(this.position.x, this.position.y)).normalL(),
+            new Vector(this.position.x, this.position.y + this.height).subtract(new Vector(this.position.x, this.position.y)).normalL()
+        ]
+    }
+    
     checkCollision(object: PhysicalObject, newPosition: Coordonate): boolean {
         let isColliding = false;
         if(object instanceof PhysicalRectangle) {

@@ -1,6 +1,7 @@
 import { Square } from "../model/square";
 import { MazeGrid } from "../model/maze-grid";
 import Door from "../model/door";
+import { Position } from "../physics/utils/physical-tools";
 
 class Node {
     partOf: number[] = [];
@@ -15,12 +16,12 @@ export class TreeNode {
     numberMap: Map<number, Node>;
 
     constructor(squareFrom: Square | Position) {
-        let squareForm = (squareForm instanceof Square) ? squareForm : TreeNode.mazeGrid.getSquare(squareForm.)
+        let square = (squareFrom instanceof Square) ? squareFrom : TreeNode.mazeGrid.getSquare(squareFrom.x, squareFrom.y);
         if(TreeNode.mazeGrid && TreeNode.mazeGrid.isFullyGenerated) {
             this._initNumberMap();
-            let squareADoorsOpen = squareFrom.getDoorsOpen();
+            let squareADoorsOpen = square.getDoorsOpen();
             for (let i = 0; i < squareADoorsOpen.length; i++) {
-                this._getPathFromSquare(squareFrom, [squareADoorsOpen[i]]);
+                this._getPathFromSquare(square, [squareADoorsOpen[i]]);
             }
         } else {
             throw "Le labyrinthe n'est pas entièrement généré";

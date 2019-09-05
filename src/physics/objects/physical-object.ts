@@ -12,6 +12,15 @@ export class PhysicalObject {
 
     public layer: PhysicalLayer;
 
+    
+    public get center() : Position {
+        return new Position(this.position.x, this.position.y);
+    }
+    
+    public get normals() : Vector[] {
+        return [];
+    }
+
     protected _renderer: ObjectRenderer;
     public get renderer(): ObjectRenderer {
         return this._renderer;

@@ -609,6 +609,15 @@ export default class Vector {
         return this;
     };
 
+
+    normalL(): Vector {
+        return new Vector(this.y, this.x).normalize();
+    }
+
+    normalR(): Vector {
+        return new Vector(-this.y, -this.x).normalize();
+    }
+
     /**
      * Normalize
      *
@@ -616,7 +625,7 @@ export default class Vector {
      * @api public
      */
     normalize(): Vector {
-        var length = this.length();
+        var length = this.length
 
         if (length === 0) {
             this.x = 1;
@@ -1170,7 +1179,7 @@ export default class Vector {
      * @return {Number} Length / Magnitude
      * @api public
      */
-    length(): number {
+    public get length(): number {
         return Math.sqrt(this.lengthSq());
     };
 

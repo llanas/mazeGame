@@ -81,8 +81,8 @@ export class Game {
             if(enemy.position.gridPosition === this.player.position.gridPosition) {
                 enemy.movingVector = this.player.position.vector.clone().subtract(enemy.position.vector).normalize().scale(enemy.speed);
             } else {
-                let pathToPlayer = playerTreeNode.getPathToSquare(this.groundLayer.mazeGrid.getSquare(enemy.position.gridPosition.x, enemy.position.gridPosition.y));
-                enemy.movingVector = MazeGrid.getVectorBetweenSquare(pathToPlayer[pathToPlayer.length - 1], pathToPlayer[pathToPlayer.length - 2]).normalize().scale(enemy.speed);
+                // let pathToPlayer = playerTreeNode.getPathToSquare(this.groundLayer.mazeGrid.getSquare(enemy.position.gridPosition.x, enemy.position.gridPosition.y));
+                // enemy.movingVector = MazeGrid.getVectorBetweenSquare(pathToPlayer[pathToPlayer.length - 1], pathToPlayer[pathToPlayer.length - 2]).normalize().scale(enemy.speed);
             }
         }
         this.enemiesLayer.moveAll(this.groundLayer, this.playerLayer);
