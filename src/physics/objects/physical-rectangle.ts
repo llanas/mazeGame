@@ -1,5 +1,5 @@
 import { PhysicalObject } from "./physical-object";
-import { Position, Coordonate } from "../utils/physical-tools";
+import { Coordonate } from "../utils/physical-tools";
 import PhysicalCircle from "./physical-circle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
@@ -11,7 +11,7 @@ export default class PhysicalRectangle extends PhysicalObject {
     width: number;
     height: number;
 
-    constructor(_position: Position, _width: number, _height: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
+    constructor(_position: Vector, _width: number, _height: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
         super(_position, _colidingParameters, _renderer);
         this.width = _width;
         this.height = _height;
@@ -38,7 +38,7 @@ export default class PhysicalRectangle extends PhysicalObject {
         return isColliding;
     }
 
-    getVectorAfterBounce(position: Position, movingVector: Vector): Vector {
+    getVectorAfterBounce(position: Vector, movingVector: Vector): Vector {
         let minX = Math.min(this.position.x, this.position.x + this.width);
         let maxX = Math.max(this.position.x, this.position.x + this.width);
         let minY = Math.min(this.position.y, this.position.y + this.height);
@@ -89,7 +89,7 @@ export default class PhysicalRectangle extends PhysicalObject {
         return movingVector;
     }
 
-    getVectorAfterSlide(position: Position, radius: number, movingVector: Vector): Vector {
+    getVectorAfterSlide(position: Vector, radius: number, movingVector: Vector): Vector {
 
         let minX = Math.min(this.position.x, this.position.x + this.width);
         let maxX = Math.max(this.position.x, this.position.x + this.width);

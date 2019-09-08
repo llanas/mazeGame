@@ -1,8 +1,9 @@
 import { Drawer } from "../../renderer/drawer";
 import { PhysicalMatrix } from "../utils/physical-matrix";
 import { PhysicalObject } from "../objects/physical-object";
-import { Position, ListPhysicalObject } from "../utils/physical-tools";
+import { ListPhysicalObject } from "../utils/physical-tools";
 import { CONST_COLIDING_PARAMETERS } from "../utils/physical-parameters";
+import Vector from "../objects/physical-vector";
 
 export class PhysicalLayer {
 
@@ -10,8 +11,8 @@ export class PhysicalLayer {
     public matrix: PhysicalMatrix<PhysicalObject>;
     protected listMovableObject: ListPhysicalObject<PhysicalObject> = new ListPhysicalObject();
 
-    constructor(gridWidth: number, gridHeight: number, drawer: Drawer) {
-        this.matrix = new PhysicalMatrix(gridWidth, gridHeight);
+    constructor(_matrixScaleWidth: number, _matrixScaleHeight: number, drawer: Drawer) {
+        this.matrix = new PhysicalMatrix(_matrixScaleWidth, _matrixScaleHeight);
         this.drawer = drawer;
     }
 
@@ -37,7 +38,7 @@ export class PhysicalLayer {
         }
     }
 
-    getColidingObjects(object: PhysicalObject, newPosition: Position): PhysicalObject[] {
+    getColidingObjects(object: PhysicalObject, newPosition: Vector): PhysicalObject[] {
         let objectsColidingWith: PhysicalObject[] = [];
         let listColidingObject = this.matrix.getAround(newPosition, CONST_COLIDING_PARAMETERS.ONLY_COLIDING);
         for (let i = 0; i < listColidingObject.length; i++) {
@@ -51,7 +52,7 @@ export class PhysicalLayer {
     move(object: PhysicalObject) {
         if(object.movingVector != null && !object.movingVector.isZero()) {
             let positionAfterMove = object.getPositionAfterMove();
-            if(!this.matrix.hasPosition(positionAfterMove.gridPosition)) {
+            if(!this.matrix.hasPosition(this.matrix.getMatrixPositionByScale(positionAfterMove))) {
                 object.destroy();
             } else {
                 this.matrix.move(object, object.position, positionAfterMove);

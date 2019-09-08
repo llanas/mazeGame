@@ -27,7 +27,7 @@ export default class BombMazeGenerator implements IMazeGenerator {
             this.mapNumber.set(squareInProgress.number, bombSquare);
         }
         this.listDoorsAvailable = this.mazeGrid.listDoors.filter(door => door.isOpenable);
-    }
+    }    
 
     step(): void {
 
@@ -35,10 +35,10 @@ export default class BombMazeGenerator implements IMazeGenerator {
         let doorInProgress = this.listDoorsAvailable[rand];
     
         let squareMin = (doorInProgress.isVertical) ? 
-            this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x - 1, doorInProgress.position.gridPosition.y) : 
-            this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y - 1);
+            this.mazeGrid.getSquare({x: doorInProgress.coordonate.x - 1, y: doorInProgress.coordonate.y}) : 
+            this.mazeGrid.getSquare({x: doorInProgress.coordonate.x, y: doorInProgress.coordonate.y - 1});
 
-        let squareMax = this.mazeGrid.getSquare(doorInProgress.position.gridPosition.x, doorInProgress.position.gridPosition.y);
+        let squareMax = this.mazeGrid.getSquare(doorInProgress.coordonate);
 
         let minBomb = this.mapNumber.get(this.mapNumber.get(squareMin.number).bombNumber);
         let maxBomb = this.mapNumber.get(this.mapNumber.get(squareMax.number).bombNumber);

@@ -1,5 +1,4 @@
 import { PhysicalObject } from "./physical-object";
-import { Position } from "../utils/physical-tools";
 import PhysicalRectangle from "./physical-rectangle";
 import PhysicsUtils from "../utils/physical-utils";
 import Vector from "./physical-vector";
@@ -10,7 +9,7 @@ export default class PhysicalCircle extends PhysicalObject {
 
     radius: number;
 
-    constructor(_position: Position, _radius: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
+    constructor(_position: Vector, _radius: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
         super(_position, _colidingParameters, _renderer);
         this.radius = _radius;
     }
@@ -21,7 +20,7 @@ export default class PhysicalCircle extends PhysicalObject {
         }
     }
 
-    checkCollision(object: PhysicalObject, newPosition: Position): boolean {
+    checkCollision(object: PhysicalObject, newPosition: Vector): boolean {
         let isColliding = false;
         
         if(object instanceof PhysicalRectangle) {

@@ -8,7 +8,7 @@ import { Constants } from "./utils/constants";
 import { GroundLayer } from "./physics/layers/ground-layer";
 
 export let v = Vector;
-export let mazeGrid = MazeGrid;
+export let mazeGrid: MazeGrid;
 export let game = Game;
 export let constant = Constants;
 
@@ -19,11 +19,18 @@ let groundLayer: GroundLayer = null;
 let fpsInterval: number;
 
 export function init() {
-
+ 
     let gridWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
     let gridHeightInput = <HTMLInputElement> document.getElementById("mapHeight");
 
-    groundLayer = new GroundLayer(gridWidthInput.valueAsNumber, gridHeightInput.valueAsNumber);
+    Constants.mazeWidth = gridWidthInput.valueAsNumber;
+    Constants.mazeHeight = gridHeightInput.valueAsNumber;
+    
+    Constants.gameCanvasWidth = (Constants.mazeWidth * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
+    Constants.gameCanvasHeight = (Constants.mazeHeight * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
+
+    groundLayer = new GroundLayer();
+    mazeGrid = groundLayer.mazeGrid;
     mazeGenAlgo = _getMazeGenAlgo();
     groundLayer.render();
 

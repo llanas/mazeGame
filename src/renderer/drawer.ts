@@ -1,19 +1,16 @@
-import { MazeGrid } from "../model/maze-grid";
 import Player from "../model/player";
-import { Constants } from "../utils/constants";
 import { PhysicalObject } from "../physics/objects/physical-object";
 import PhysicalCircle from "../physics/objects/physical-circle";
 import PhysicalRectangle from "../physics/objects/physical-rectangle";
-import { Coordonate, Position } from "../physics/utils/physical-tools";
+import { Coordonate } from "../physics/utils/physical-tools";
 import { ObjectRenderer } from "./object-renderer";
+import Vector from "../physics/objects/physical-vector";
+import { Constants } from "../utils/constants";
 
 export class Drawer {
 
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
-
-    public static gameCanvasWidth: number = 100;
-    public static gameCanvasHeight: number = 100;
 
     constructor(_canvasId: string) {
         this.canvas = <HTMLCanvasElement> document.getElementById(_canvasId);
@@ -26,12 +23,12 @@ export class Drawer {
         }
     }
 
-    public getCanvasPositionFromWindowCoordonate(coordonate: Coordonate): Position {
+    public getCanvasPositionFromWindowCoordonate(coordonate: Coordonate): Vector {
         let rect = this.canvas.getBoundingClientRect();
         let scaleX = this.canvas.width / rect.width;
         let scaleY = this.canvas.height / rect.height;
           
-        return new Position((coordonate.x - rect.left) * scaleX, (coordonate.y - rect.top) * scaleY);
+        return new Vector((coordonate.x - rect.left) * scaleX, (coordonate.y - rect.top) * scaleY);
     }
 
     display() {
@@ -39,10 +36,10 @@ export class Drawer {
     }
 
     clear() {
-        this.context.clearRect(0, 0, Drawer.gameCanvasWidth, Drawer.gameCanvasHeight);
+        this.context.clearRect(0, 0, Constants.gameCanvasWidth, Constants.gameCanvasHeight);
     }
 
-    resize(width: number = Drawer.gameCanvasWidth, height: number = Drawer.gameCanvasHeight) {
+    resize(width: number = Constants.gameCanvasWidth, height: number = Constants.gameCanvasHeight) {
         this.canvas.width = width;
         this.canvas.height = height;
     }

@@ -1,5 +1,4 @@
 import PhysicalCircle from "../physics/objects/physical-circle";
-import { Position } from "../physics/utils/physical-tools";
 import Vector from "../physics/objects/physical-vector";
 import { Constants } from "../utils/constants";
 import { Bullet } from "./bullet";
@@ -10,8 +9,6 @@ import { PhysicalObject } from "../physics/objects/physical-object";
 import { Enemy } from "./enemy";
 import { IMovable } from "./interfaces/movable-interface";
 import { TreeNode } from "../algo/treeNode";
-import { Game } from "../game/game";
-import { MazeGrid } from "./maze-grid";
 
 export default class Player extends PhysicalCircle implements ILiving, IMovable {
     
@@ -21,29 +18,25 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
     public detonationOnCooldown: boolean = false;
     public treeNode: TreeNode;
 
-    constructor(position: Position) {
+    constructor(position: Vector) {
         super(position, Constants.playerSize, CONST_COLIDING_PARAMETERS.PERSONNAGE_COLIDING, ObjectRenderer.player);
         this.colidingParameters.sliding = true;
         this.speed = Constants.defaultPlayerSpeed;
     }
 
     move() {
-        let oldGridPosition = this.position.clone().gridPosition;
         super.move();
-        if(this.position.gridPosition != oldGridPosition) {
-            this.treeNode = new TreeNode(this.position);
-        }
     }
 
-    getPositionAfterMove(vector: Vector = this.movingVector): Position {
+    getPositionAfterMove(vector: Vector = this.movingVector): Vector {
         return super.getPositionAfterMove(vector.normalize().scale(this.speed).toFixed(2));
     }
 
-    fire(fireDirection: Position): Bullet | null {
+    fire(fireDirection: Vector): Bullet | null {
         let newBullet = null;
         if(!this.detonationOnCooldown) {
-            fireDirection.vector.subtract(this.position);
-            newBullet = new Bullet(this.position.clone(), fireDirection.vector);
+            fireDirection.subtract(this.position);
+            newBullet = new Bullet(this.position.clone(), fireDirection);
             setTimeout(() => this.detonationOnCooldown = false, Constants.playerFireDetonationCooldown);
             this.detonationOnCooldown = true;
         }

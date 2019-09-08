@@ -1,23 +1,29 @@
 import { PhysicalObject } from "../objects/physical-object";
-import { Position, ListPhysicalObject, Coordonate } from "./physical-tools";
+import { ListPhysicalObject, Coordonate } from "./physical-tools";
 import { ColidingParameters } from "./physical-parameters";
+import Vector from "../objects/physical-vector";
+import { Constants } from "../../utils/constants";
 
 export class PhysicalMatrix<T extends PhysicalObject> {
 
     private matrix: Map<number, Map<number, ListPhysicalObject<T>>> = new Map();
-    matrixWidth: number;
-    matrixHeight: number;
+    matrixScaleWidth: number;
+    matrixScaleHeight: number;
 
-    constructor(gridWidth: number, gridHeight: number) {
-        this.matrixWidth = gridWidth;
-        this.matrixHeight = gridHeight;
-        for (let x = 0; x < gridWidth; x++) {
+    constructor(matrixScaleWidth: number, matrixScaleHeight: number) {
+        this.matrixScaleWidth = matrixScaleWidth;
+        this.matrixScaleHeight = matrixScaleHeight;
+        for (let x = 0; x < matrixScaleWidth; x++) {
             let columnMap = new Map<number, ListPhysicalObject<T>>();
-            for (let y = 0; y < gridHeight; y++) {
+            for (let y = 0; y < matrixScaleHeight; y++) {
                 columnMap.set(y, new ListPhysicalObject<T>());
             }
             this.matrix.set(x, columnMap);
         }
+    }
+
+    getMatrixPositionByScale(position: {x: number, y: number}): Coordonate {
+        return {x:Math.floor(position.x / (Constants.gameCanvasWidth / this.matrixScaleWidth)), y: Math.floor(position.y / (Constants.gameCanvasHeight / this.matrixScaleHeight))};
     }
 
     hasPosition(position: Coordonate): boolean {
@@ -25,9 +31,9 @@ export class PhysicalMatrix<T extends PhysicalObject> {
     }
 
     extend(scale: number) {
-        for (let x = -scale; x < this.matrixHeight + scale; x++) {
+        for (let x = -scale; x < this.matrixScaleWidth + scale; x++) {
             if(!this.matrix.has(x)) this.matrix.set(x, new Map<number, ListPhysicalObject<T>>());
-            for(let y = -scale;  y < this.matrixHeight + scale; y++) {
+            for(let y = -scale;  y < this.matrixScaleHeight + scale; y++) {
                 if(!this.matrix.get(x).has(y)) this.matrix.get(x).set(y, new ListPhysicalObject<T>());
             }
         }
@@ -50,14 +56,15 @@ export class PhysicalMatrix<T extends PhysicalObject> {
         return listColidingObjects;
     }
 
-    getAround(position: Position, colidingParameters?: ColidingParameters) {
+    getAround(position: Vector, colidingParameters?: ColidingParameters) {
 
         let listColidingObjects = [];
-        let minX = (position.gridPosition.x - 1 >= 0) ? position.gridPosition.x - 1 : 0;
-        let maxX = (position.gridPosition.x + 1 <= this.matrixWidth) ? position.gridPosition.x + 1 : this.matrixWidth;
+        let matrixCoordonate = this.getMatrixPositionByScale(position);
+        let minX = (matrixCoordonate.x - 1 >= 0) ? matrixCoordonate.x - 1 : 0;
+        let maxX = (matrixCoordonate.x + 1 <= this.matrixScaleWidth) ? matrixCoordonate.x + 1 : this.matrixScaleWidth;
 
-        let minY = (position.gridPosition.y - 1 >= 0) ? position.gridPosition.y - 1 : 0;
-        let maxY = (position.gridPosition.y + 1 <= this.matrixHeight) ? position.gridPosition.y + 1 : this.matrixHeight;
+        let minY = (matrixCoordonate.y - 1 >= 0) ? matrixCoordonate.y - 1 : 0;
+        let maxY = (matrixCoordonate.y + 1 <= this.matrixScaleHeight) ? matrixCoordonate.y + 1 : this.matrixScaleHeight;
         
         for (let x = minX; x <= maxX; x++) {
             let columnMap = this.matrix.get(x);
@@ -71,21 +78,21 @@ export class PhysicalMatrix<T extends PhysicalObject> {
     }
 
     push(object: T, position?: {x: number, y: number}) {
-        let gridX = (position) ? position.x : object.position.gridPosition.x;
-        let gridY = (position) ? position.y : object.position.gridPosition.y;
-        this.matrix.get(gridX).get(gridY).push(object);
+        let positionInMatrix = (position) ? position: this.getMatrixPositionByScale(object.position);
+        this.matrix.get(positionInMatrix.x).get(positionInMatrix.y).push(object);
     }
 
     remove(object: T, position?: {x: number, y: number}) {
-        let gridX = (position) ? position.x : object.position.gridPosition.x;
-        let gridY = (position) ? position.y : object.position.gridPosition.y;
-        this.matrix.get(gridX).get(gridY).remove(object);
+        let positionInMatrix = (position) ? position: this.getMatrixPositionByScale(object.position);
+        this.matrix.get(positionInMatrix.x).get(positionInMatrix.y).remove(object);
     }
 
-    move(object: T, oldPosition: Position, newPosition: Position) {
-        if(oldPosition.gridPosition != newPosition.gridPosition) {
-            this.remove(object, oldPosition.gridPosition);
-            this.push(object, newPosition.gridPosition);
+    move(object: T, oldPosition: Vector, newPosition: Vector) {
+        let oldPositionInMatrix = this.getMatrixPositionByScale(oldPosition);
+        let newPositionInMatrix = this.getMatrixPositionByScale(newPosition);
+        if(oldPositionInMatrix != newPositionInMatrix) {
+            this.remove(object, oldPositionInMatrix);
+            this.push(object, newPositionInMatrix);
         }
     }
 }

@@ -1,6 +1,7 @@
 import { Square } from "../model/square";
 import { MazeGrid } from "../model/maze-grid";
 import Door from "../model/door";
+import Vector from "../physics/objects/physical-vector";
 
 class Node {
     partOf: number[] = [];
@@ -9,18 +10,16 @@ class Node {
 
 export class TreeNode {
 
-    private static mazeGrid: MazeGrid;
-
     listPaths: Square[][] = [];
     numberMap: Map<number, Node>;
 
-    constructor(squareFrom: Square | Position) {
-        let squareForm = (squareForm instanceof Square) ? squareForm : TreeNode.mazeGrid.getSquare(squareForm.)
-        if(TreeNode.mazeGrid && TreeNode.mazeGrid.isFullyGenerated) {
-            this._initNumberMap();
-            let squareADoorsOpen = squareFrom.getDoorsOpen();
+    constructor(squareFrom: Square | Vector, mazeGrid: MazeGrid) {
+        let initialSquare = (squareFrom instanceof Square) ? squareFrom : mazeGrid.getSquare(squareFrom);
+        if(mazeGrid && mazeGrid.isFullyGenerated) {
+            this._initNumberMap(mazeGrid);
+            let squareADoorsOpen = initialSquare.getDoorsOpen();
             for (let i = 0; i < squareADoorsOpen.length; i++) {
-                this._getPathFromSquare(squareFrom, [squareADoorsOpen[i]]);
+                this._getPathFromSquare(mazeGrid, initialSquare, [squareADoorsOpen[i]]);
             }
         } else {
             throw "Le labyrinthe n'est pas entièrement généré";
@@ -70,14 +69,15 @@ export class TreeNode {
         }
     }
     
-    private _initNumberMap() {
+    private _initNumberMap(mazeGrid: MazeGrid) {
         this.numberMap = new Map();
-        for (let i = 0; i < TreeNode.mazeGrid.listSquares.length; i++) {
-            this.numberMap.set(TreeNode.mazeGrid.listSquares[i].number, new Node());
+        for (let i = 0; i < mazeGrid.listSquares.length; i++) {
+            this.numberMap.set(mazeGrid.listSquares[i].number, new Node());
         }
     }
 
-    private _getPathFromSquare(square: Square, _doorsToTreat?: Door[]): Square[] {
+    private _getPathFromSquare(mazeGrid: MazeGrid, square: Square, _doorsToTreat?: Door[]): Square[] {
+
         // Initialisation
         let path: Square[] = [];
         this.listPaths.push(path);
@@ -96,14 +96,14 @@ export class TreeNode {
                     return;
                 case 1: // aller
                     this.numberMap.get(squareIterator.number).partOf.push(actualPath);
-                    squareIterator = TreeNode.mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[0]);
+                    squareIterator = mazeGrid.getSquareByDoor(squareIterator, doorsToTreat[0]);
                     let doorsComeBy = doorsToTreat[0];
                     doorsToTreat = squareIterator.getDoorsOpen();
                     doorsToTreat.splice(doorsToTreat.indexOf(doorsComeBy), 1);
                     break;
                 default: // node
                     for (let i = 0; i < doorsToTreat.length; i++) {
-                        this._getPathFromSquare(squareIterator, [doorsToTreat[i]]);
+                        this._getPathFromSquare(mazeGrid, squareIterator, [doorsToTreat[i]]);
                     }
                     this.numberMap.get(squareIterator.number).endPath = actualPath;
                     return;

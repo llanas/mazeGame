@@ -1,11 +1,12 @@
 import { Square } from "./square";
 import Door from "./door";
-import { Position, ListPhysicalObject } from "../physics/utils/physical-tools";
+import { ListPhysicalObject, Coordonate } from "../physics/utils/physical-tools";
 import { TreeNode } from "../algo/treeNode";
 import { PhysicalMatrix } from "../physics/utils/physical-matrix";
 import { PhysicalObject } from "../physics/objects/physical-object";
 import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
 import Vector from "../physics/objects/physical-vector";
+import { Constants } from "../utils/constants";
 
 export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
 
@@ -29,15 +30,15 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
     }
 
     static getVectorBetweenSquare(squareA: Square, squareB: Square): Vector {
-        return squareB.getCenterPosition().vector.clone().subtract(squareA.getCenterPosition().vector);
+        return squareB.getCenterPosition().clone().subtract(squareA.getCenterPosition());
     }
 
-    getSquare(x: number, y: number): Square {
+    getSquare({x, y}: {x: number, y: number}): Square {
         return <Square> this.get<Square>(x, y, CONST_COLIDING_PARAMETERS.EMPTY_COLIDING, Square)[0];
     }
 
-    getStraightPathsFromPosition(position: Position): Square[] {
-        let square = this.getSquare(position.gridPosition.x, position.gridPosition.y);
+    getStraightPathsFromPosition(position: Coordonate): Square[] {
+        let square = this.getSquare(position);
         return this._treeNode.getStraightPathFromSquare(square);
     } 
 
@@ -56,13 +57,13 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
         let yPosition;
         if(door.isOpenable) {
             if(door.isVertical) {
-                xPosition = (door.position.gridPosition.x === basedSquare.position.gridPosition.x) ? door.position.gridPosition.x - 1 : door.position.gridPosition.x;
-                yPosition = door.position.gridPosition.y;
+                xPosition = (door.coordonate.x === basedSquare.coordonate.x) ? door.coordonate.x - 1 : door.coordonate.x;
+                yPosition = door.coordonate.y;
             } else {
-                xPosition = door.position.gridPosition.x;
-                yPosition = (door.position.gridPosition.y === basedSquare.position.gridPosition.y) ? door.position.gridPosition.y - 1 : door.position.gridPosition.y;
+                xPosition = door.coordonate.x;
+                yPosition = (door.coordonate.y === basedSquare.coordonate.y) ? door.coordonate.y - 1 : door.coordonate.y;
             }
-            return this.getSquare(xPosition, yPosition);
+            return this.getSquare({x: xPosition, y: yPosition});
         } else {
             throw "La porte n'est pas ouvrable";
         }
@@ -101,7 +102,7 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
     public set isFullyGenerated(value: boolean) {
         this._isFullyGenerated = value;
         if(value) {
-            this._treeNode = new TreeNode(this.listSquares[0]);
+            this._treeNode = new TreeNode(this.listSquares[0], this);
         }
     }
 
@@ -118,36 +119,34 @@ export class MazeGrid extends PhysicalMatrix<PhysicalObject> {
         for (let i = 0; i < this.listSquares.length; i++) {
             const square = this.listSquares[i];
 
-            if(square.position.y !== 0) {
+            if(square.coordonate.y !== 0) {
                 square.topDoor = this.getSquareByPosition(square.number - 1).bottomDoor;
             } else {
-                square.topDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, false, false);
+                square.topDoor = this._buildDoor(square.coordonate.x, square.coordonate.y, false, false);
             }
 
-            if(square.position.x !== 0) {
+            if(square.coordonate.x !== 0) {
                 square.leftDoor = this.getSquareByPosition(square.number - this.height).rightDoor;
             } else {
-                square.leftDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y, true, false);
+                square.leftDoor = this._buildDoor(square.coordonate.x, square.coordonate.y, true, false);
             }
 
-            square.rightDoor = this._buildDoor(square.position.gridPosition.x + 1, square.position.gridPosition.y, true, square.position.gridPosition.x !== this.width - 1);
-            square.bottomDoor = this._buildDoor(square.position.gridPosition.x, square.position.gridPosition.y + 1, false, square.position.gridPosition.y !== this.height - 1);
+            square.rightDoor = this._buildDoor(square.coordonate.x + 1, square.coordonate.y, true, square.coordonate.x !== this.width - 1);
+            square.bottomDoor = this._buildDoor(square.coordonate.x, square.coordonate.y + 1, false, square.coordonate.y !== this.height - 1);
         }
     }
 
     private _buildSquare(_gridX: number, _gridY: number): Square {
-        let squarePosition = Position.buildFromGridPosition(_gridX, _gridY);
-        let newSquare = new Square(this.listSquares.length, squarePosition);
+        let newSquare = new Square(this.listSquares.length, new Vector(_gridX * Constants.gridSquareSize, _gridY * Constants.gridSquareSize));
         this.listSquares.push(newSquare);
-        this.push(newSquare, squarePosition.gridPosition);
+        this.push(newSquare, {x: _gridX, y: _gridY});
         return newSquare;
     }
 
     private _buildDoor(_gridX: number, _gridY: number, _isVerticale: boolean, _isOpenable: boolean): Door {
-        let doorPosition = Position.buildFromGridPosition(_gridX, _gridY);
-        let newDoor = new Door(doorPosition, _isVerticale, _isOpenable);
+        let newDoor = new Door({x: _gridX, y: _gridY}, _isVerticale, _isOpenable);
         this.listDoors.push(newDoor);
-        this.push(newDoor, doorPosition.gridPosition);
+        this.push(newDoor, {x: _gridX, y: _gridY});
         return newDoor;
     }
 }

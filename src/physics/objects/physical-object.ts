@@ -1,4 +1,4 @@
-import { Position, Coordonate } from "../utils/physical-tools";
+import { Coordonate } from "../utils/physical-tools";
 import Vector from "./physical-vector";
 import { ObjectRenderer } from "../../renderer/object-renderer";
 import { ColidingParameters } from "../utils/physical-parameters";
@@ -6,7 +6,7 @@ import { PhysicalLayer } from "../layers/physical-layer";
 
 export class PhysicalObject {
 
-    position: Position;
+    position: Vector;
     colidingParameters: ColidingParameters;
     movingVector: Vector | null;
 
@@ -20,7 +20,7 @@ export class PhysicalObject {
         this._renderer = renderer;
     }
 
-    constructor(_position: Position, _colidingParameters: ColidingParameters, _renderer: ObjectRenderer = ObjectRenderer.defaultRenderer()) {
+    constructor(_position: Vector, _colidingParameters: ColidingParameters, _renderer: ObjectRenderer = ObjectRenderer.defaultRenderer()) {
         this.position = _position;
         this._renderer = _renderer;
         this.colidingParameters = _colidingParameters;
@@ -30,14 +30,14 @@ export class PhysicalObject {
 
     }
 
-    getPositionAfterMove(vector: Vector = this.movingVector): Position {
-        return this.position.clone().move(vector);
+    getPositionAfterMove(vector: Vector = this.movingVector): Vector {
+        return this.position.clone().add(vector);
     }
 
     move(movingVector: Vector = this.movingVector) {
         if(this.colidingParameters.movable) {
             if(movingVector != null && !movingVector.isZero()) {
-                this.position.move(movingVector);
+                this.position.add(movingVector);
             }
         }
     }
