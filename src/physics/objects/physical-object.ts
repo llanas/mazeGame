@@ -13,8 +13,8 @@ export class PhysicalObject {
     public layer: PhysicalLayer;
 
     
-    public get center() : Position {
-        return new Position(this.position.x, this.position.y);
+    public get center() : Vector {
+        return new Vector(this.position.x, this.position.y);
     }
     
     public get normals() : Vector[] {

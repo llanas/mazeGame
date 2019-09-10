@@ -14,8 +14,8 @@ export default class PhysicalCircle extends PhysicalObject {
         this.radius = _radius;
     }
 
-    get center(): Position {
-        return new Position(this.position.x, this.position.y);
+    get center(): Vector {
+        return new Vector(this.position.x, this.position.y);
     }
 
     move(movingVector: Vector = this.movingVector) {

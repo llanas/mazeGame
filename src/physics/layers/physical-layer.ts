@@ -4,6 +4,7 @@ import { PhysicalObject } from "../objects/physical-object";
 import { ListPhysicalObject } from "../utils/physical-tools";
 import { CONST_COLIDING_PARAMETERS } from "../utils/physical-parameters";
 import Vector from "../objects/physical-vector";
+import { Colision, ColisionResult } from "../utils/physical-colision";
 
 export class PhysicalLayer {
 
@@ -20,33 +21,41 @@ export class PhysicalLayer {
         for (let i = 0; i < this.listMovableObject.length; i++) {
             const movingObject = this.listMovableObject[i];
             if(movingObject.movingVector != null && !movingObject.movingVector.isZero()) {
-                let positionAfterMove = movingObject.getPositionAfterMove();
-                
+                // let positionAfterMove = movingObject.getPositionAfterMove();
+                movingObject.move();
                 let listColidingObjects: PhysicalObject[] = [];
                 for (let y = 0; y < colidingLayers.length; y++) {
-                    listColidingObjects.push(... colidingLayers[y].getColidingObjects(movingObject, positionAfterMove));
-                }
-                if(listColidingObjects.length != 0) {
-                    for (let z = 0; z < listColidingObjects.length; z++) {
-                        if(listColidingObjects[z].checkCollision(movingObject, movingObject.getPositionAfterMove())) {
-                            movingObject.colidingWith(listColidingObjects[z]);
-                        }
+                    // listColidingObjects.push(... colidingLayers[y].getColidingObjects(movingObject, positionAfterMove));
+                    let colidingResult = colidingLayers[y].getColidingObjects(movingObject);
+                    if(colidingResult != null && colidingResult.isColiding) {
+                        movingObject.move(colidingResult.outVector);
                     }
                 }
-                this.move(movingObject);
+                // if(listColidingObjects.length != 0) {
+                //     for (let z = 0; z < listColidingObjects.length; z++) {
+                //         if(listColidingObjects[z].checkCollision(movingObject, movingObject.getPositionAfterMove())) {
+                //             movingObject.colidingWith(listColidingObjects[z]);
+                //         }
+                //     }
+                // }
+                // this.move(movingObject);
             }
         }
     }
 
-    getColidingObjects(object: PhysicalObject, newPosition: Vector): PhysicalObject[] {
+    getColidingObjects(object: PhysicalObject): ColisionResult | null {
         let objectsColidingWith: PhysicalObject[] = [];
-        let listColidingObject = this.matrix.getAround(newPosition, CONST_COLIDING_PARAMETERS.ONLY_COLIDING);
+        let listColidingObject = this.matrix.getAround(object.position, CONST_COLIDING_PARAMETERS.ONLY_COLIDING);
         for (let i = 0; i < listColidingObject.length; i++) {
-            if(object.checkCollision(listColidingObject[i], newPosition)) {
-                objectsColidingWith.push(listColidingObject[i]);
+            let colidingResult = Colision.checkColision(listColidingObject[i], object);
+            // if(object.checkCollision(listColidingObject[i], newPosition)) {
+            //     objectsColidingWith.push(listColidingObject[i]);
+            // }
+            if(colidingResult != undefined && colidingResult.isColiding) {
+                return colidingResult;
             }
         }
-        return objectsColidingWith;
+        return null;
     }
 
     move(object: PhysicalObject) {
