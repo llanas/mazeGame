@@ -7,24 +7,21 @@ export class Colision {
 
     private constructor() {}
 
-    static checkColision(objectA: PhysicalObject, objectB: PhysicalObject): ColisionResult {
+    static checkColision(objectA: PhysicalObject, objectB: PhysicalObject) {
 
-        let colisionResult: ColisionResult;
         if(objectA instanceof PhysicalCircle) {
             if(objectB instanceof PhysicalCircle) {
-                colisionResult = Colision.checkCirclesColision(objectA, objectB);
+                Colision.checkCirclesColision(objectA, objectB);
             } else if(objectB instanceof PhysicalRectangle) {
-                colisionResult = Colision.checkRectangleAndCircleColision(objectB, objectA)
+                Colision.checkRectangleAndCircleColision(objectB, objectA)
             }
         } else if(objectA instanceof PhysicalRectangle) {
             if(objectB instanceof PhysicalCircle) {
-                colisionResult = Colision.checkRectangleAndCircleColision(objectA, objectB)
+                Colision.checkRectangleAndCircleColision(objectA, objectB)
             } else if(objectB instanceof PhysicalRectangle) {
-                colisionResult = Colision.checkRectanglesColision(objectA, objectB);
+                Colision.checkRectanglesColision(objectA, objectB);
             }
         }
-
-        return colisionResult;
     }
 
     static checkCirclesColision(circleA: PhysicalCircle, circleB: PhysicalCircle) {
@@ -34,7 +31,7 @@ export class Colision {
         }
     }
 
-    static checkRectanglesColision(rectA: PhysicalRectangle, rectB: PhysicalRectangle): ColisionResult {
+    static checkRectanglesColision(rectA: PhysicalRectangle, rectB: PhysicalRectangle) {
         let listPojectionVectors = [...rectA.normals, ...rectB.normals];
 
         listPojectionVectors.push(rectB.center.subtract(rectA.center));
@@ -84,16 +81,19 @@ export class Colision {
 
     
     static checkRectangleAndCircleColision(rect: PhysicalRectangle, circle: PhysicalCircle) {
-        let centerVector = rect.center.subtract(circle.center);
-        let maxCorner = new Vector();
+        let rectToCircleV = circle.center.subtract(rect.center);
+        let rectToCircleVNorm = rectToCircleV.clone().normalize();
+        let maxProjection = new Vector();
         rect.getAllCorners().forEach(corner => {
-            let projectedVector = corner.projectOnto(centerVector);
-            if(projectedVector.length > maxCorner.length) {
-                maxCorner = projectedVector;
+            let centerToCornerV = corner.subtract(rect.center);
+            let projectedVector = centerToCornerV.multiply(rectToCircleVNorm);
+            if(projectedVector.length > maxProjection.length) {
+                maxProjection = projectedVector;
             }
         })
-        if(maxCorner.length - circle.radius <= 0) {
-            Colision.colide(rect, circle, maxCorner.subtract(circle.center));
+        if(rectToCircleV.length - maxProjection.length - circle.radius > 0 && rectToCircleV.length > 0) {
+        } else {
+            Colision.colide(rect, circle, maxProjection.subtract(circle.center));
         }
     }
 
@@ -108,17 +108,5 @@ export class Colision {
         }
         objectA.colidingWith(objectB);
         objectB.colidingWith(objectA);
-    }
-}
-
-
-export class ColisionResult {
-
-    isColiding: boolean;
-    outVector: Vector;
-
-    constructor(_isColiding: boolean = false, _outVector: Vector = new Vector(0, 0)) {
-        this.isColiding = _isColiding;
-        this.outVector = _outVector;
     }
 }

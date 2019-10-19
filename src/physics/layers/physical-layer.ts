@@ -3,8 +3,7 @@ import { PhysicalMatrix } from "../utils/physical-matrix";
 import { PhysicalObject } from "../objects/physical-object";
 import { ListPhysicalObject } from "../utils/physical-tools";
 import { CONST_COLIDING_PARAMETERS } from "../utils/physical-parameters";
-import Vector from "../objects/physical-vector";
-import { Colision, ColisionResult } from "../utils/physical-colision";
+import { Colision } from "../utils/physical-colision";
 
 export class PhysicalLayer {
 
@@ -23,13 +22,9 @@ export class PhysicalLayer {
             if(movingObject.movingVector != null && !movingObject.movingVector.isZero()) {
                 // let positionAfterMove = movingObject.getPositionAfterMove();
                 movingObject.move();
-                let listColidingObjects: PhysicalObject[] = [];
                 for (let y = 0; y < colidingLayers.length; y++) {
                     // listColidingObjects.push(... colidingLayers[y].getColidingObjects(movingObject, positionAfterMove));
-                    let colidingResult = colidingLayers[y].getColidingObjects(movingObject);
-                    if(colidingResult != null && colidingResult.isColiding) {
-                        movingObject.move(colidingResult.outVector);
-                    }
+                    colidingLayers[y].getColidingObjects(movingObject);
                 }
                 // if(listColidingObjects.length != 0) {
                 //     for (let z = 0; z < listColidingObjects.length; z++) {
@@ -43,19 +38,11 @@ export class PhysicalLayer {
         }
     }
 
-    getColidingObjects(object: PhysicalObject): ColisionResult | null {
-        let objectsColidingWith: PhysicalObject[] = [];
+    getColidingObjects(object: PhysicalObject) {
         let listColidingObject = this.matrix.getAround(object.position, CONST_COLIDING_PARAMETERS.ONLY_COLIDING);
         for (let i = 0; i < listColidingObject.length; i++) {
-            let colidingResult = Colision.checkColision(listColidingObject[i], object);
-            // if(object.checkCollision(listColidingObject[i], newPosition)) {
-            //     objectsColidingWith.push(listColidingObject[i]);
-            // }
-            if(colidingResult != undefined && colidingResult.isColiding) {
-                return colidingResult;
-            }
+            Colision.checkColision(listColidingObject[i], object);
         }
-        return null;
     }
 
     move(object: PhysicalObject) {
