@@ -1,5 +1,3 @@
-import { test } from 'maze-generator';
-
 import BombMazeGenerator from './algo/mazegen/mazegen-bomb-impl';
 import BuildMazeGenerator from './algo/mazegen/mazegen-build-impl';
 import { IMazeGenerator } from './algo/mazegen/mazegen-interface';
@@ -109,5 +107,4 @@ function updateFrameId() {
     let domGameContent = <HTMLElement> document.getElementById("gameContent");
     Constants.canvasOffsetLeft = domGameContent.offsetLeft;
     Constants.canvasOffsetTop = domGameContent.offsetTop;
-    test();
 })();
