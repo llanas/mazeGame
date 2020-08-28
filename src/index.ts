@@ -1,11 +1,13 @@
-import { MazeGrid } from "./model/maze-grid";
-import { IMazeGenerator } from "./algo/mazegen/mazegen-interface";
-import BuildMazeGenerator from "./algo/mazegen/mazegen-build-impl";
-import BombMazeGenerator from "./algo/mazegen/mazegen-bomb-impl";
-import Vector from "./physics/objects/physical-vector";
-import { Game } from "./game/game";
-import { Constants } from "./utils/constants";
-import { GroundLayer } from "./physics/layers/ground-layer";
+import { test } from 'maze-generator';
+
+import BombMazeGenerator from './algo/mazegen/mazegen-bomb-impl';
+import BuildMazeGenerator from './algo/mazegen/mazegen-build-impl';
+import { IMazeGenerator } from './algo/mazegen/mazegen-interface';
+import { Game } from './game/game';
+import { MazeGrid } from './model/maze-grid';
+import { GroundLayer } from './physics/layers/ground-layer';
+import Vector from './physics/objects/physical-vector';
+import { Constants } from './utils/constants';
 
 export let v = Vector;
 export let mazeGrid: MazeGrid;
@@ -19,13 +21,13 @@ let groundLayer: GroundLayer = null;
 let fpsInterval: number;
 
 export function init() {
- 
+
     let gridWidthInput = <HTMLInputElement> document.getElementById("mapWidth");
     let gridHeightInput = <HTMLInputElement> document.getElementById("mapHeight");
 
     Constants.mazeWidth = gridWidthInput.valueAsNumber;
     Constants.mazeHeight = gridHeightInput.valueAsNumber;
-    
+
     Constants.gameCanvasWidth = (Constants.mazeWidth * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
     Constants.gameCanvasHeight = (Constants.mazeHeight * Constants.gridSquareSize) + Constants.gridSquareSize / 20;
 
@@ -37,18 +39,18 @@ export function init() {
 }
 
 export function process() {
-    if(groundLayer.mazeGrid.isFullyGenerated) {
+    if (groundLayer.mazeGrid.isFullyGenerated) {
         mazeGenAlgo = _getMazeGenAlgo();
     }
-    while(!groundLayer.mazeGrid.isFullyGenerated) {
+    while (!groundLayer.mazeGrid.isFullyGenerated) {
         mazeGenAlgo.step();
     }
     groundLayer.render();
 }
 
 export function step() {
-    if(groundLayer != null && mazeGenAlgo != null) {
-        if(groundLayer.mazeGrid.isFullyGenerated) {
+    if (groundLayer != null && mazeGenAlgo != null) {
+        if (groundLayer.mazeGrid.isFullyGenerated) {
             console.log("Maze is fully generated");
         } else {
             mazeGenAlgo.step();
@@ -66,12 +68,12 @@ export function solution() {
 }
 
 function _getMazeGenAlgo(): IMazeGenerator {
-    if(groundLayer.mazeGrid != null) {
+    if (groundLayer.mazeGrid != null) {
         let _algoGenInput = <HTMLInputElement> document.querySelector('input[name="algoInput"]:checked');
-        switch(_algoGenInput.value) {
-            case "build": 
+        switch (_algoGenInput.value) {
+            case "build":
                 return new BuildMazeGenerator(groundLayer.mazeGrid);
-            case "bomb": 
+            case "bomb":
                 return new BombMazeGenerator(groundLayer.mazeGrid);
         }
     }
@@ -81,7 +83,7 @@ function _getMazeGenAlgo(): IMazeGenerator {
 // GAME INPUTS
 
 export function start() {
-    if(Game.getInstance() != null) {
+    if (Game.getInstance() != null) {
         stop();
     }
     Game.instanciate(groundLayer);
@@ -103,8 +105,9 @@ function updateFrameId() {
     frameIdInput.value = "" + Game.getInstance().fps;
 }
 
-(function() {
+(function () {
     let domGameContent = <HTMLElement> document.getElementById("gameContent");
     Constants.canvasOffsetLeft = domGameContent.offsetLeft;
     Constants.canvasOffsetTop = domGameContent.offsetTop;
+    test();
 })();

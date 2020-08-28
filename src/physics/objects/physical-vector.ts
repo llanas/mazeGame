@@ -548,6 +548,7 @@ export default class Vector {
     scale(scaler: number): Vector {
         this.x *= scaler;
         this.y *= scaler;
+        this.toFixed(3);
         return this;
     }
 

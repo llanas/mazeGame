@@ -1,17 +1,17 @@
-import PhysicalCircle from "../physics/objects/physical-circle";
-import Vector from "../physics/objects/physical-vector";
-import { Constants } from "../utils/constants";
-import { Bullet } from "./bullet";
-import { ObjectRenderer } from "../renderer/object-renderer";
-import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
-import { ILiving } from "./interfaces/living-interface";
-import { PhysicalObject } from "../physics/objects/physical-object";
-import { Enemy } from "./enemy";
-import { IMovable } from "./interfaces/movable-interface";
-import { TreeNode } from "../algo/treeNode";
+import { TreeNode } from '../algo/treeNode';
+import PhysicalCircle from '../physics/objects/physical-circle';
+import { PhysicalObject } from '../physics/objects/physical-object';
+import Vector from '../physics/objects/physical-vector';
+import { CONST_COLIDING_PARAMETERS } from '../physics/utils/physical-parameters';
+import { ObjectRenderer } from '../renderer/object-renderer';
+import { Constants } from '../utils/constants';
+import { Bullet } from './bullet';
+import { Enemy } from './enemy';
+import { ILiving } from './interfaces/living-interface';
+import { IMovable } from './interfaces/movable-interface';
 
 export default class Player extends PhysicalCircle implements ILiving, IMovable {
-    
+
     public life: number = 200;
     public speed: number;
     public visibilityRadius: number = Constants.playerVisibilityRadius;
@@ -24,8 +24,8 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
         this.speed = Constants.defaultPlayerSpeed;
     }
 
-    move() {
-        super.move();
+    move(movingVector: Vector = this.movingVector) {
+        super.move(movingVector);
     }
 
     getPositionAfterMove(vector: Vector = this.movingVector): Vector {
@@ -34,7 +34,7 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
 
     fire(fireDirection: Vector): Bullet | null {
         let newBullet = null;
-        if(!this.detonationOnCooldown) {
+        if (!this.detonationOnCooldown) {
             fireDirection.subtract(this.position);
             newBullet = new Bullet(this.position.clone(), fireDirection);
             setTimeout(() => this.detonationOnCooldown = false, Constants.playerFireDetonationCooldown);
@@ -44,7 +44,7 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
     }
 
     colidingWith(objectColidingWith: PhysicalObject | ILiving) {
-        if(objectColidingWith instanceof Enemy) {
+        if (objectColidingWith instanceof Enemy) {
             this.damaging(50);
         }
         super.colidingWith(objectColidingWith as PhysicalObject);
@@ -52,7 +52,7 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
 
     damaging(damageAmount: number): void {
         this.life -= damageAmount;
-        if(this.life <= 0) {
+        if (this.life <= 0) {
             this.destroy();
         }
     }
