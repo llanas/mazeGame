@@ -3,15 +3,15 @@ const degrees = 180 / Math.PI;
 
 export default class Vector {
 
-    private static random (min: number, max: number) {
+    private static random(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
-    
-    private static radian2degrees (rad: number) {
+
+    private static radian2degrees(rad: number) {
         return rad * degrees;
     }
-    
-    private static degrees2radian (deg: number) {
+
+    private static degrees2radian(deg: number) {
         return deg / degrees;
     }
     /**
@@ -51,7 +51,7 @@ export default class Vector {
     x: number;
     y: number;
 
-    constructor(_x: number = 0, _y: number = 0) {
+    constructor (_x: number = 0, _y: number = 0) {
         this.x = _x;
         this.y = _y;
     }
@@ -1199,8 +1199,6 @@ export default class Vector {
     lengthSq(): number {
         return this.x * this.x + this.y * this.y;
     };
-
-    magnitude = length;
 
     /**
      * Returns a true if vector is (0, 0)

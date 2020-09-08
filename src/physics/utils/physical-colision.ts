@@ -9,36 +9,40 @@ export class Colision {
 
     static checkColision(objectA: PhysicalObject, objectB: PhysicalObject) {
 
+        let movingOutVector = null;
         if (objectA instanceof PhysicalCircle) {
             if (objectB instanceof PhysicalCircle) {
-                Colision.checkCirclesColision(objectA, objectB);
+                movingOutVector = Colision.checkCirclesColision(objectA, objectB);
             } else if (objectB instanceof PhysicalRectangle) {
-                Colision.checkRectangleAndCircleColision(objectB, objectA)
+                movingOutVector = Colision.checkRectangleAndCircleColision(objectB, objectA)
             }
         } else if (objectA instanceof PhysicalRectangle) {
             if (objectB instanceof PhysicalCircle) {
-                Colision.checkRectangleAndCircleColision(objectA, objectB)
+                movingOutVector = Colision.checkRectangleAndCircleColision(objectA, objectB)
             } else if (objectB instanceof PhysicalRectangle) {
-                Colision.checkRectanglesColision(objectA, objectB);
+                movingOutVector = Colision.checkRectanglesColision(objectA, objectB);
             }
+        }
+        if (movingOutVector != null) {
+            Colision.colide(objectA, objectB, movingOutVector);
         }
     }
 
     static checkCirclesColision(circleA: PhysicalCircle, circleB: PhysicalCircle) {
         let separatingVector = new Vector(circleB.center.x, circleB.center.y).subtract(new Vector(circleA.center.x, circleA.center.y));
         if (separatingVector.length <= circleA.radius + circleB.radius) {
-            Colision.colide(circleA, circleB, separatingVector);
+            return separatingVector;
         }
+        return null;
     }
 
-    static checkRectanglesColision(rectA: PhysicalRectangle, rectB: PhysicalRectangle) {
+    static checkRectanglesColision(rectA: PhysicalRectangle, rectB: PhysicalRectangle): Vector | null {
         let listPojectionVectors = [...rectA.normals, ...rectB.normals];
+        let minVectorOut = new Vector(Infinity, Infinity);
 
         listPojectionVectors.push(rectB.center.subtract(rectA.center));
         let rectACorners = rectA.getAllCorners().map(corner => corner.subtract(rectA.center));
         let rectBCorners = rectB.getAllCorners().map(corner => corner.subtract(rectB.center));;
-
-        let minVectorOut: Vector;
 
         for (let i = 0; i < listPojectionVectors.length; i++) {
             const projectionVector = listPojectionVectors[i];
@@ -74,13 +78,12 @@ export class Colision {
                 }
             }
         }
-        if (minVectorOut != null) {
-            Colision.colide(rectA, rectB, minVectorOut);
-        }
+        return minVectorOut;
     }
 
 
-    static checkRectangleAndCircleColision(rect: PhysicalRectangle, circle: PhysicalCircle) {
+    static checkRectangleAndCircleColision(rect: PhysicalRectangle, circle: PhysicalCircle): Vector | null {
+        let movingOutVector = null;
         let rectToCircleV = circle.center.subtract(rect.center);
         let rectToCircleVNorm = rectToCircleV.clone().normalize();
         let max, maxProjection = new Vector();
@@ -95,7 +98,6 @@ export class Colision {
         let penetrationDistance = rectToCircleV.length - maxProjection.length - circle.radius;
         if (penetrationDistance <= 0 || rectToCircleV.length <= 0) {
             let normals = rect.normals;
-            let movingOutVector: Vector;
             let normalProjectionA = normals[0].clone().projectOnto(rectToCircleV);
             let normalProjectionB = normals[1].clone().projectOnto(rectToCircleV);
             if (normalProjectionA < normalProjectionB) {
@@ -103,8 +105,8 @@ export class Colision {
             } else {
                 movingOutVector = maxProjection.projectOnto(normals[1]).normalize().scale(penetrationDistance);
             }
-            Colision.colide(rect, circle, movingOutVector);
         }
+        return movingOutVector;
     }
 
     static colide(objectA: PhysicalObject, objectB: PhysicalObject, separatingVectorAB: Vector) {
