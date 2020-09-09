@@ -660,6 +660,10 @@ export default class Vector {
         return this;
     };
 
+    absolute() {
+        return new Vector(Math.abs(this.x), Math.abs(this.y));
+    }
+
     /**
      * Randomizes both vector axis with a value between 2 vectors
      *
