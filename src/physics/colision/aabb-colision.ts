@@ -1,7 +1,8 @@
+import { process } from '../..';
 import PhysicalCircle from '../objects/physical-circle';
 import PhysicalRectangle from '../objects/physical-rectangle';
 import Vector from '../objects/physical-vector';
-import { Position } from '../utils/physical-tools';
+import { CONST_COLIDING_PARAMETERS } from '../utils/physical-parameters';
 import { IColision } from './colision-interface';
 
 export default class AABBColision implements IColision {
@@ -10,17 +11,33 @@ export default class AABBColision implements IColision {
         return Math.abs(circle.position.clone().subtract(point).length) <= circle.radius;
     }
 
+    checkPointAndRectangleColision(point: Vector, rect: PhysicalRectangle): boolean {
+        return (point.x >= rect.position.x
+            && point.x < rect.position.x + rect.width
+            && point.y >= rect.position.y
+            && point.y < rect.position.y + rect.height);
+    }
+
     checkRayAndCircleColision(rayPosition: Vector, rayVector: Vector, circle: PhysicalCircle): boolean {
         if (this.checkPointAndCircleColision(rayPosition, circle)) return true;
-        let relativeCirclePosition = circle.position.clone().subtract(rayPosition);
+        let relativeCirclePosition = circle.center.clone().subtract(rayPosition);
         // Project circle center on the
         let closestPointOnRay = relativeCirclePosition.clone().projectOnto(rayVector);
         if (closestPointOnRay.length > rayVector.length + circle.radius) return false;
-        return Math.abs(relativeCirclePosition.subtract(closestPointOnRay).length) <= circle.radius;
+        return Math.abs(relativeCirclePosition.clone().subtract(closestPointOnRay).length) <= circle.radius;
     }
 
+    // checkRayAndRectangleColision(rayPosition: Vector, rayVector: Vector, circle: PhysicalCircle): boolean {
+    //     if (this.checkPointAndCircleColision(rayPosition, circle)) return true;
+    //     let relativeCirclePosition = circle.position.clone().subtract(rayPosition);
+    //     // Project circle center on the
+    //     let closestPointOnRay = relativeCirclePosition.clone().projectOnto(rayVector);
+    //     if (closestPointOnRay.length > rayVector.length + circle.radius) return false;
+    //     return Math.abs(relativeCirclePosition.clone().subtract(closestPointOnRay).length) <= circle.radius;
+    // }
+
     checkCirclesColision(circleA: PhysicalCircle, circleB: PhysicalCircle): boolean {
-        return Math.abs(circleB.position.subtract(circleA.position).length) <= circleA.radius + circleB.radius;
+        return Math.abs(circleB.position.clone().subtract(circleA.position).length) <= circleA.radius + circleB.radius;
     }
 
     checkRectanglesColision(rectA: PhysicalRectangle, rectB: PhysicalRectangle): boolean {
@@ -30,28 +47,35 @@ export default class AABBColision implements IColision {
             rectA.position.y + rectA.height >= rectB.position.y);
     }
 
-    // checkRectangleAndCircleColision(rect: PhysicalRectangle, circle: PhysicalCircle): Vector | null {
-    //     // 1 - Check outbond rectangle Circle
-    //     let halfWidth = rect.width / 2;
-    //     let halfHeight = rect.height / 2;
-    //     let xCircleDistance = Math.abs(circle.position.x - (rect.center.x - halfWidth));
-    //     let yCircleDistance = Math.abs(circle.position.y - (rect.center.y - halfHeight));
+    checkRectangleAndCircleColision(rect: PhysicalRectangle, circle: PhysicalCircle): boolean {
 
-    //     if (xCircleDistance > (halfWidth + circle.radius)) return null;
-    //     if (yCircleDistance > (halfHeight + circle.radius)) return null;
+        // 1 - Cast circle into rectangle and test rectangle Colision
+        const circleCastIntoRectangle = new PhysicalRectangle(
+            new Vector(circle.center.x - circle.radius, circle.center.y - circle.radius),
+            circle.radius * 2, circle.radius * 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING);
 
-    //     if (xCircleDistance <= halfWidth) return null;
-    //     if (yCircleDistance <= halfHeight) return null;
+        if (!this.checkRectanglesColision(circleCastIntoRectangle, rect)) {
+            return false;
+        }
 
-    //     let cornerDistanceSqrt = Math.sqrt(xCircleDistance - halfWidth) + Math.sqrt(yCircleDistance - halfHeight);
-    //     if (cornerDistanceSqrt > Math.sqrt(circle.radius)) {
-    //         return null;
-    //     } else {
-    //         // Colision detected
-    //         let separatingVector = rect.center.subtract(circle.center);
-    //         let xProjection = separatingVector.projectOnto(new Vector(1, 0));
-    //         let yProjection = separatingVector.projectOnto(new Vector(0, 1));
-    //         return (xProjection.length >= yProjection.length) ? yProjection : xProjection;
-    //     }
-    // }
+        // 2 - check every rectangle corner and circle
+        for (let corner of rect.getAllCorners()) {
+            if (this.checkPointAndCircleColision(corner, circle)) {
+                return true;
+            }
+        }
+
+        // 3 - Check AABB and circle center
+        if (this.checkPointAndRectangleColision(circle.center, rect)) {
+            return true;
+        }
+
+        // 4 - check projection of circle center into both rectangle segments
+        // Knowing that there is no rotation for the moment, we can project onto orthogonale x and y
+        if (circle.center.x >= rect.position.x && circle.center.x <= (rect.position.x + rect.width)
+            || circle.center.y >= rect.position.y && circle.center.y <= (rect.position.y + rect.height)) {
+            return true;
+        }
+        return false;
+    }
 }
