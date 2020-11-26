@@ -1,11 +1,29 @@
 import { process } from '../..';
 import PhysicalCircle from '../objects/physical-circle';
+import { PhysicalObject } from '../objects/physical-object';
 import PhysicalRectangle from '../objects/physical-rectangle';
 import Vector from '../objects/physical-vector';
 import { CONST_COLIDING_PARAMETERS } from '../utils/physical-parameters';
 import { IColision } from './colision-interface';
 
 export default class AABBColision implements IColision {
+
+    checkColision(objectA: PhysicalObject, objectB: PhysicalObject) {
+
+        if (objectA instanceof PhysicalCircle) {
+            if (objectB instanceof PhysicalCircle) {
+                return this.checkCirclesColision(objectA, objectB);
+            } else if (objectB instanceof PhysicalRectangle) {
+                return this.checkRectangleAndCircleColision(objectB, objectA)
+            }
+        } else if (objectA instanceof PhysicalRectangle) {
+            if (objectB instanceof PhysicalCircle) {
+                return this.checkRectangleAndCircleColision(objectA, objectB)
+            } else if (objectB instanceof PhysicalRectangle) {
+                return this.checkRectanglesColision(objectA, objectB);
+            }
+        }
+    }
 
     checkPointAndCircleColision(point: Vector, circle: PhysicalCircle): boolean {
         return Math.abs(circle.position.clone().subtract(point).length) <= circle.radius;

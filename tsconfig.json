@@ -2,11 +2,12 @@
     "compilerOptions": {
         /* Basic Options */
         "target": "es6", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
-        "module": "commonjs", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+        "module": "esnext", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
         "lib": [
             "es2015",
             "es2016",
-            "DOM"
+            "es2018",
+            "DOM",
         ], /* Specify library files to be included in the compilation. */
         "allowJs": true, /* Allow javascript files to be compiled. */
         // "checkJs": true,                       /* Report errors in .js files. */
@@ -29,6 +30,9 @@
         "strict": true, /* Enable all strict type-checking options. */
         "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
         "strictNullChecks": false, /* Enable strict null checks. */
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
         // "strictFunctionTypes": true,           /* Enable strict checking of function types. */
         // "strictBindCallApply": true,           /* Enable strict 'bind', 'call', and 'apply' methods on functions. */
         // "strictPropertyInitialization": true,  /* Enable strict checking of property initialization in classes. */
@@ -59,7 +63,6 @@
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
     },
     "exclude": [
-        "./node_modules",
         "./dist"
     ]
 }

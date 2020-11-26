@@ -5,11 +5,13 @@ import { Game } from './game/game';
 import { MazeGrid } from './model/maze-grid';
 import { GroundLayer } from './physics/layers/ground-layer';
 import Vector from './physics/objects/physical-vector';
+import { SandboxGame } from './sandbox/sandbox.game';
 import { Constants } from './utils/constants';
 
 export let v = Vector;
 export let mazeGrid: MazeGrid;
 export let game = Game;
+export let sandbox: SandboxGame;
 export let constant = Constants;
 
 let mazeGenAlgo: IMazeGenerator;
@@ -96,6 +98,14 @@ export function addEnemi() {
 export function stop() {
     Game.getInstance().end();
     clearInterval(fpsInterval);
+}
+
+export function sandboxStart() {
+    sandbox = new SandboxGame();
+    sandbox.start();
+}
+export function sandboxStop() {
+    sandbox.end();
 }
 
 function updateFrameId() {

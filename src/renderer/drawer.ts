@@ -12,9 +12,9 @@ export class Drawer {
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
 
-    constructor(_canvasId: string) {
+    constructor (_canvasId: string) {
         this.canvas = <HTMLCanvasElement> document.getElementById(_canvasId);
-        if(this.canvas.getContext) {
+        if (this.canvas.getContext) {
             this.context = this.canvas.getContext("2d");
             this.resize();
             this.display();
@@ -27,7 +27,7 @@ export class Drawer {
         let rect = this.canvas.getBoundingClientRect();
         let scaleX = this.canvas.width / rect.width;
         let scaleY = this.canvas.height / rect.height;
-          
+
         return new Vector((coordonate.x - rect.left) * scaleX, (coordonate.y - rect.top) * scaleY);
     }
 
@@ -45,9 +45,9 @@ export class Drawer {
     }
 
     drawPhysicalObject(obj: PhysicalObject, renderer?: ObjectRenderer) {
-        if(obj instanceof PhysicalCircle) {
+        if (obj instanceof PhysicalCircle) {
             this._drawCircle(obj, renderer);
-        } else if(obj instanceof PhysicalRectangle) {
+        } else if (obj instanceof PhysicalRectangle) {
             this._drawRectangle(obj, renderer);
         }
     }

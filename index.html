@@ -47,10 +47,22 @@
                 <input type="button" onclick="index.start()" value="Start" />
                 <input type="button" onclick="index.addEnemi()" value="Ennemi">
                 <input type="button" onclick="index.stop()" value="Stop" />
+            </div><br />
+            <div class="actions">
+                <input type="button" onclick="index.sandboxStart()" value="Start sandbox" />
+                <input type="button" onclick="index.sandboxStop()" value="Stop sandbox" />
             </div>
             <div id="console">
 
             </div>
+        </div>
+        <div id="testContent">
+            <canvas id="sandbox_ground_layer" class="gameCanvas" width="100" height="100">
+
+            </canvas>
+            <canvas id="sandbox_play_layer" class="gameCanvas" width="100" height="100">
+
+            </canvas>
         </div>
         <div id="gameContent">
             <canvas id="ground_layer" class="gameCanvas" width="100" height="100" hidden>
