@@ -26,6 +26,7 @@ export class Colision {
         if (movingOutVector != null) {
             Colision.colide(objectA, objectB, movingOutVector);
         }
+        return movingOutVector != null;
     }
 
     static checkCirclesColision(circleA: PhysicalCircle, circleB: PhysicalCircle) {

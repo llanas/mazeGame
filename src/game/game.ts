@@ -1,19 +1,17 @@
-import { Drawer } from "../renderer/drawer";
-import Player from "../model/player";
-import { Constants } from "../utils/constants";
-import { GameUtils } from "./game-utils";
-import { InputController } from "./input-controller";
-import { DomUtils } from "../utils/dom-utils";
-import { Enemy } from "../model/enemy";
-import { Utils } from "../utils/utils";
-import { PlayerLayer } from "../physics/layers/player-layer";
-import { GroundLayer } from "../physics/layers/ground-layer";
-import { EnemiesLayer } from "../physics/layers/enemies-layer";
-import { UpperLayer } from "../physics/layers/upper-layer";
-import { TreeNode } from "../algo/treeNode";
-import { MazeGrid } from "../model/maze-grid";
-import { CONST_COLIDING_PARAMETERS } from "../physics/utils/physical-parameters";
-import Vector from "../physics/objects/physical-vector";
+import { Enemy } from '../model/enemy';
+import Player from '../model/player';
+import { EnemiesLayer } from '../physics/layers/enemies-layer';
+import { GroundLayer } from '../physics/layers/ground-layer';
+import { PlayerLayer } from '../physics/layers/player-layer';
+import { UpperLayer } from '../physics/layers/upper-layer';
+import Vector from '../physics/objects/physical-vector';
+import { CONST_COLIDING_PARAMETERS } from '../physics/utils/physical-parameters';
+import { Drawer } from '../renderer/drawer';
+import { Constants } from '../utils/constants';
+import { DomUtils } from '../utils/dom-utils';
+import { Utils } from '../utils/utils';
+import { GameUtils } from './game-utils';
+import { InputController } from './input-controller';
 
 export class Game {
 
@@ -43,17 +41,17 @@ export class Game {
 
     private player: Player;
 
-    private constructor(groundLayer: GroundLayer) {
+    private constructor (groundLayer: GroundLayer) {
         this.player = new Player(GameUtils.getPlayerStartPosition());
 
-        let playableLayer = new Drawer(Constants.playerLayerId);
+        let playableDrawer = new Drawer(Constants.playerLayerId);
 
         this.groundLayer = groundLayer;
-        this.playerLayer = new PlayerLayer(this.player, playableLayer);
-        this.enemiesLayer = new EnemiesLayer(playableLayer);
+        this.playerLayer = new PlayerLayer(this.player, playableDrawer);
+        this.enemiesLayer = new EnemiesLayer(playableDrawer);
         this.upperLayer = new UpperLayer(this.player, groundLayer.mazeGrid);
     }
-    
+
     start() {
         DomUtils.removeAllFocus();
         this.animationFrameId = window.requestAnimationFrame(this.update.bind(this));
@@ -68,12 +66,12 @@ export class Game {
 
     private update() {
         this.player.movingVector = InputController.getInstance().getVectorFromInputs();
-        if(InputController.getInstance().firePressed) {
+        if (InputController.getInstance().firePressed) {
             let firePosition = this.playerLayer.drawer.getCanvasPositionFromWindowCoordonate(InputController.getInstance().mousePosition)
             let newBullet = this.player.fire(firePosition);
-            if(newBullet != null) this.playerLayer.add(newBullet);
+            if (newBullet != null) this.playerLayer.add(newBullet);
         }
-        
+
         this.playerLayer.moveAll(this.groundLayer, this.enemiesLayer);
         let listEnemies = <Enemy[]> this.enemiesLayer.matrix.getAll<Enemy>(CONST_COLIDING_PARAMETERS.PERSONNAGE_COLIDING, Enemy);
         // for (let i = 0; i < listEnemies.length; i++) {
@@ -86,10 +84,10 @@ export class Game {
         //     }
         // }
         this.enemiesLayer.moveAll(this.groundLayer, this.playerLayer);
-        
+
         this.render();
 
-        if(this.isGameOver()) {
+        if (this.isGameOver()) {
             this.end();
             return;
         }
