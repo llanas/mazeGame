@@ -1,6 +1,6 @@
 import PhysicalCircle from '../objects/physical-circle';
 import PhysicalRectangle from '../objects/physical-rectangle';
-import Vector from '../objects/physical-vector';
+import Vector from '../utils/physical-vector';
 
 export interface IColision {
 

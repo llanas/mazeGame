@@ -1,8 +1,8 @@
 import { Constants } from '../../utils/constants';
 import { PhysicalObject } from '../objects/physical-object';
-import Vector from '../objects/physical-vector';
 import { ColidingParameters } from './physical-parameters';
 import { Coordonate, ListPhysicalObject } from './physical-tools';
+import Vector from './physical-vector';
 
 /**
  * PhysicalMatrix

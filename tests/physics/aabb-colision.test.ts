@@ -1,7 +1,7 @@
 import '../../src/physics/objects/physical-circle';
 import PhysicalCircle from '../../src/physics/objects/physical-circle';
 import { CONST_COLIDING_PARAMETERS } from '../../src/physics/utils/physical-parameters';
-import Vector from '../../src/physics/objects/physical-vector';
+import Vector from '../../src/physics/utils/physical-vector';
 import PhysicalRectangle from '../../src/physics/objects/physical-rectangle';
 import AABBColision from '../../src/physics/colision/aabb-colision';
 import { Position } from '../../src/physics/utils/physical-tools';

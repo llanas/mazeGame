@@ -1,27 +1,27 @@
-import { ObjectRenderer } from "../../renderer/object-renderer";
-import { ColidingParameters } from "../utils/physical-parameters";
-import { Coordonate, Position } from "../utils/physical-tools";
-import PhysicsUtils from "../utils/physical-utils";
-import PhysicalCircle from "./physical-circle";
-import { PhysicalObject } from "./physical-object";
-import Vector from "./physical-vector";
+import { ObjectRenderer } from '../../renderer/object-renderer';
+import { ColidingParameters } from '../utils/physical-parameters';
+import { Coordonate } from '../utils/physical-tools';
+import PhysicsUtils from '../utils/physical-utils';
+import Vector from '../utils/physical-vector';
+import PhysicalCircle from './physical-circle';
+import { PhysicalObject } from './physical-object';
 
 export default class PhysicalRectangle extends PhysicalObject {
 
     width: number;
     height: number;
 
-    constructor(_position: Vector, _width: number, _height: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
+    constructor (_position: Vector, _width: number, _height: number, _colidingParameters: ColidingParameters, _renderer?: ObjectRenderer) {
         super(_position, _colidingParameters, _renderer);
         this.width = _width;
         this.height = _height;
     }
 
-    public get center() : Vector {
+    public get center(): Vector {
         return new Vector(this.position.x + (this.width / 2), this.position.y + (this.height / 2));
     }
-    
-    public get normals() : Vector[] {
+
+    public get normals(): Vector[] {
         return [
             new Vector(this.position.x + this.width, this.position.y).subtract(new Vector(this.position.x, this.position.y)).normalL(),
             new Vector(this.position.x, this.position.y + this.height).subtract(new Vector(this.position.x, this.position.y)).normalL()
@@ -36,16 +36,16 @@ export default class PhysicalRectangle extends PhysicalObject {
         corners.push(new Vector(this.position.x, this.position.y + this.height));
         return corners;
     }
-    
+
     checkCollision(object: PhysicalObject, newPosition: Coordonate): boolean {
         let isColliding = false;
-        if(object instanceof PhysicalRectangle) {
-            isColliding = 
-                newPosition.x < object.position.x + object.width 
+        if (object instanceof PhysicalRectangle) {
+            isColliding =
+                newPosition.x < object.position.x + object.width
                 && newPosition.x + this.width > object.position.x
-                && newPosition.y < object.position.y + object.height 
+                && newPosition.y < object.position.y + object.height
                 && this.height + newPosition.y > object.position.y
-        } else if(object instanceof PhysicalCircle) {
+        } else if (object instanceof PhysicalCircle) {
 
             let closestX = PhysicsUtils.findClosestFromCircleCenter(object.position.x, newPosition.x, newPosition.x + this.width);
             let closestY = PhysicsUtils.findClosestFromCircleCenter(object.position.y, newPosition.y, newPosition.y + this.height);
@@ -69,12 +69,12 @@ export default class PhysicalRectangle extends PhysicalObject {
 
         let side = 0;
 
-        if(minY > newY) side += 1; // Si top
-        if(maxX < newX) side += 2; // Si right
-        if(maxY < newY) side += 4; // Si bottom
-        if(minX > newX) side += 8; // Si left
+        if (minY > newY) side += 1; // Si top
+        if (maxX < newX) side += 2; // Si right
+        if (maxY < newY) side += 4; // Si bottom
+        if (minX > newX) side += 8; // Si left
 
-        switch(side) {
+        switch (side) {
             case 0:
                 throw "Incident de collision, le point est à l'intérieur du rectangle";
             case 1: // Only TOP
@@ -121,17 +121,17 @@ export default class PhysicalRectangle extends PhysicalObject {
 
         let side = 0;
 
-        if(minY > newY) side += 1; // Si top
-        if(maxX < newX) side += 2; // Si right
-        if(maxY < newY) side += 4; // Si bottom
-        if(minX > newX) side += 8; // Si left
+        if (minY > newY) side += 1; // Si top
+        if (maxX < newX) side += 2; // Si right
+        if (maxY < newY) side += 4; // Si bottom
+        if (minX > newX) side += 8; // Si left
 
         let angle = movingVector.angleDeg();
 
         let deltaY: number;
         let deltaX: number;
 
-        switch(side) {
+        switch (side) {
             case 0:
                 throw "Incident de collision, le point est à l'intérieur du rectangle";
             case 1: // Only TOP
@@ -147,28 +147,28 @@ export default class PhysicalRectangle extends PhysicalObject {
                 movingVector.x = 0;
                 break;
             case 3: // TOP-RIGHT
-                if(angle < 135 && angle >= 90) {
+                if (angle < 135 && angle >= 90) {
                     // On descend à 90
-                    if(maxX + radius >= newX) {
+                    if (maxX + radius >= newX) {
                         movingVector.x = 1;
                         movingVector.y = 0;
                     } else {
                         movingVector.x = 0;
                     }
-                } else if(angle > 135) {
+                } else if (angle > 135) {
                     // On va a gauche 180
-                    if(minY - radius <= newY) {
+                    if (minY - radius <= newY) {
                         movingVector.y = -1;
                         movingVector.x = 0;
                     } else {
                         movingVector.y = 0;
                     }
-                } else if(angle === 135) {
+                } else if (angle === 135) {
                     deltaX = Math.abs(newX - maxX);
                     deltaY = Math.abs(newY - minY);
-                    if(deltaX > deltaY) {
+                    if (deltaX > deltaY) {
                         // On descend à 90
-                        if(maxX + radius >= newX) {
+                        if (maxX + radius >= newX) {
                             movingVector.x = 1;
                             movingVector.y = 0;
                         } else {
@@ -176,7 +176,7 @@ export default class PhysicalRectangle extends PhysicalObject {
                         }
                     } else {
                         // On va a gauche 180
-                        if(minY - radius <= newY) {
+                        if (minY - radius <= newY) {
                             movingVector.y = -1;
                             movingVector.x = 0;
                         } else {
@@ -186,30 +186,30 @@ export default class PhysicalRectangle extends PhysicalObject {
                 }
                 break;
             case 6: // RIGHT-BOTTOM
-                if(angle <= -90 && angle > -135) {
+                if (angle <= -90 && angle > -135) {
                     // On monte à -90
-                    if(maxX + radius >= newX) {
+                    if (maxX + radius >= newX) {
                         // on se décale à droite
                         movingVector.x = 1;
                         movingVector.y = 0;
                     } else {
                         movingVector.x = 0;
                     }
-                } else if(angle < -135 || angle === 180) {
+                } else if (angle < -135 || angle === 180) {
                     // On va à gauche 180
-                    if(maxY + radius >= newY) {
+                    if (maxY + radius >= newY) {
                         // On se décale vers le bas
                         movingVector.y = 1;
                         movingVector.x = 0;
                     } else {
                         movingVector.y = 0;
                     }
-                } else if(angle === -135) {
+                } else if (angle === -135) {
                     deltaX = Math.abs(newX - maxX);
                     deltaY = Math.abs(newY - maxY);
-                    if(deltaX > deltaY) {
+                    if (deltaX > deltaY) {
                         // On monte à -90
-                        if(maxX + radius >= newX) {
+                        if (maxX + radius >= newX) {
                             // on se décale à droite
                             movingVector.x = 1;
                             movingVector.y = 0;
@@ -218,7 +218,7 @@ export default class PhysicalRectangle extends PhysicalObject {
                         }
                     } else {
                         // On va à gauche 180
-                        if(maxY + radius >= newY) {
+                        if (maxY + radius >= newY) {
                             // On se décale vers le bas
                             movingVector.y = 1;
                             movingVector.x = 0;
@@ -229,30 +229,30 @@ export default class PhysicalRectangle extends PhysicalObject {
                 }
                 break;
             case 12: // BOTTOM-LEFT
-                if(angle < -45 && angle >= -90) {
+                if (angle < -45 && angle >= -90) {
                     // On monte à -90
-                    if(minX - radius <= newX) {
+                    if (minX - radius <= newX) {
                         // On se décale à gauche
                         movingVector.x = -1;
                         movingVector.y = 0;
                     } else {
                         movingVector.x = 0;
                     }
-                } else if(angle > -45 && angle <= 0) {
+                } else if (angle > -45 && angle <= 0) {
                     // On va à droite 0
-                    if(maxY + radius >= newY) {
+                    if (maxY + radius >= newY) {
                         // On se décale vers le bas
                         movingVector.y = 1;
                         movingVector.x = 0
                     } else {
                         movingVector.y = 0;
                     }
-                } else if(angle === -45) {
+                } else if (angle === -45) {
                     deltaX = Math.abs(newX - minX);
                     deltaY = Math.abs(newY - maxY);
-                    if(deltaX > deltaY) {
+                    if (deltaX > deltaY) {
                         // On monte à -90
-                        if(minX - radius <= newX) {
+                        if (minX - radius <= newX) {
                             // On se décale à gauche
                             movingVector.x = -1;
                             movingVector.y = 0;
@@ -261,7 +261,7 @@ export default class PhysicalRectangle extends PhysicalObject {
                         }
                     } else {
                         // On va à droite 0
-                        if(maxY + radius >= newY) {
+                        if (maxY + radius >= newY) {
                             // On se décale vers le bas
                             movingVector.y = 1;
                             movingVector.x = 0
@@ -272,30 +272,30 @@ export default class PhysicalRectangle extends PhysicalObject {
                 }
                 break;
             case 9: // LEFT-TOP
-                if(angle > 45 && angle <= 90) {
+                if (angle > 45 && angle <= 90) {
                     // On descend 90
-                    if(minX - radius <= newX) {
+                    if (minX - radius <= newX) {
                         // On décale à gauche
                         movingVector.x = -1;
                         movingVector.y = 0;
                     } else {
                         movingVector.x = 0;
                     }
-                } else if(angle < 45 && angle >= 0) {
+                } else if (angle < 45 && angle >= 0) {
                     // On va à droite 0
-                    if(minY - radius <= newY) {
+                    if (minY - radius <= newY) {
                         // On se décale vers le haut
                         movingVector.y = -1;
                         movingVector.x = 0;
                     } else {
                         movingVector.y = 0;
                     }
-                } else if(angle === 45) {
+                } else if (angle === 45) {
                     deltaX = Math.abs(newX - minX);
                     deltaY = Math.abs(newY - minY);
-                    if(deltaX > deltaY) {
+                    if (deltaX > deltaY) {
                         // On descend 90
-                        if(minX - radius <= newX) {
+                        if (minX - radius <= newX) {
                             // On décale à gauche
                             movingVector.x = -1;
                             movingVector.y = 0;
@@ -304,7 +304,7 @@ export default class PhysicalRectangle extends PhysicalObject {
                         }
                     } else {
                         // On va à droite 0
-                        if(minY - radius <= newY) {
+                        if (minY - radius <= newY) {
                             // On se décale vers le haut
                             movingVector.y = -1;
                             movingVector.x = 0;

@@ -1,6 +1,7 @@
 import { Key } from 'ts-keycode-enum';
+
 import { Coordonate } from '../physics/utils/physical-tools';
-import Vector from '../physics/objects/physical-vector';
+import Vector from '../physics/utils/physical-vector';
 import { DomUtils } from '../utils/dom-utils';
 
 export class InputController {

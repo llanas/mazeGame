@@ -4,7 +4,7 @@ import { IMazeGenerator } from './algo/mazegen/mazegen-interface';
 import { Game } from './game/game';
 import { MazeGrid } from './model/maze-grid';
 import { GroundLayer } from './physics/layers/ground-layer';
-import Vector from './physics/objects/physical-vector';
+import Vector from './physics/utils/physical-vector';
 import { SandboxGame } from './sandbox/sandbox.game';
 import { Constants } from './utils/constants';
 

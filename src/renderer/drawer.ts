@@ -2,8 +2,8 @@ import Player from '../model/player';
 import PhysicalCircle from '../physics/objects/physical-circle';
 import { PhysicalObject } from '../physics/objects/physical-object';
 import PhysicalRectangle from '../physics/objects/physical-rectangle';
-import Vector from '../physics/objects/physical-vector';
 import { Coordonate } from '../physics/utils/physical-tools';
+import Vector from '../physics/utils/physical-vector';
 import { Constants } from '../utils/constants';
 import { ObjectRenderer } from './object-renderer';
 

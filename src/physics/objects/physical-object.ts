@@ -1,8 +1,8 @@
-import { Coordonate } from "../utils/physical-tools";
-import Vector from "./physical-vector";
-import { ObjectRenderer } from "../../renderer/object-renderer";
-import { ColidingParameters } from "../utils/physical-parameters";
-import { PhysicalLayer } from "../layers/physical-layer";
+import { ObjectRenderer } from '../../renderer/object-renderer';
+import { PhysicalLayer } from '../layers/physical-layer';
+import { ColidingParameters } from '../utils/physical-parameters';
+import { Coordonate } from '../utils/physical-tools';
+import Vector from '../utils/physical-vector';
 
 export class PhysicalObject {
 
@@ -12,12 +12,12 @@ export class PhysicalObject {
 
     public layer: PhysicalLayer;
 
-    
-    public get center() : Vector {
+
+    public get center(): Vector {
         return new Vector(this.position.x, this.position.y);
     }
-    
-    public get normals() : Vector[] {
+
+    public get normals(): Vector[] {
         return [];
     }
 
@@ -29,7 +29,7 @@ export class PhysicalObject {
         this._renderer = renderer;
     }
 
-    constructor(_position: Vector, _colidingParameters: ColidingParameters, _renderer: ObjectRenderer = ObjectRenderer.defaultRenderer()) {
+    constructor (_position: Vector, _colidingParameters: ColidingParameters, _renderer: ObjectRenderer = ObjectRenderer.defaultRenderer()) {
         this.position = _position;
         this._renderer = _renderer;
         this.colidingParameters = _colidingParameters;
@@ -44,8 +44,8 @@ export class PhysicalObject {
     }
 
     move(movingVector: Vector = this.movingVector) {
-        if(this.colidingParameters.movable) {
-            if(movingVector != null && !movingVector.isZero()) {
+        if (this.colidingParameters.movable) {
+            if (movingVector != null && !movingVector.isZero()) {
                 this.position.add(movingVector);
             }
         }

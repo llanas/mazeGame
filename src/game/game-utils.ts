@@ -1,5 +1,5 @@
-import Vector from "../physics/objects/physical-vector";
-import { Constants } from "../utils/constants";
+import Vector from '../physics/utils/physical-vector';
+import { Constants } from '../utils/constants';
 
 export class GameUtils {
 

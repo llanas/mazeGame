@@ -1,8 +1,8 @@
 import { TreeNode } from '../algo/treeNode';
 import PhysicalCircle from '../physics/objects/physical-circle';
 import { PhysicalObject } from '../physics/objects/physical-object';
-import Vector from '../physics/objects/physical-vector';
 import { CONST_COLIDING_PARAMETERS } from '../physics/utils/physical-parameters';
+import Vector from '../physics/utils/physical-vector';
 import { ObjectRenderer } from '../renderer/object-renderer';
 import { Constants } from '../utils/constants';
 import { Bullet } from './bullet';
@@ -18,7 +18,7 @@ export default class Player extends PhysicalCircle implements ILiving, IMovable 
     public detonationOnCooldown: boolean = false;
     public treeNode: TreeNode;
 
-    constructor(position: Vector) {
+    constructor (position: Vector) {
         super(position, Constants.playerSize, CONST_COLIDING_PARAMETERS.PERSONNAGE_COLIDING, ObjectRenderer.player);
         this.colidingParameters.sliding = true;
         this.speed = Constants.defaultPlayerSpeed;

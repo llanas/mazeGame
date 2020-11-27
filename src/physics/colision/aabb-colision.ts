@@ -1,9 +1,8 @@
-import { process } from '../..';
 import PhysicalCircle from '../objects/physical-circle';
 import { PhysicalObject } from '../objects/physical-object';
 import PhysicalRectangle from '../objects/physical-rectangle';
-import Vector from '../objects/physical-vector';
 import { CONST_COLIDING_PARAMETERS } from '../utils/physical-parameters';
+import Vector from '../utils/physical-vector';
 import { IColision } from './colision-interface';
 
 export default class AABBColision implements IColision {
