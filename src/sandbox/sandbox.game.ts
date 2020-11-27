@@ -1,6 +1,7 @@
 import { boundMethod } from 'autobind-decorator';
 
 import { InputController } from '../game/input-controller';
+import Player from '../model/player';
 import AABBColision from '../physics/colision/aabb-colision';
 import { PhysicalLayer } from '../physics/layers/physical-layer';
 import PhysicalCircle from '../physics/objects/physical-circle';
@@ -29,7 +30,7 @@ export class SandboxGame {
     public sandboxLayer: PhysicalLayer;
     public animationFrameId: number;
 
-    public mousePlayer: PhysicalCircle;
+    public mousePlayer: Player;
     public coliderService = new AABBColision();
 
     constructor () {
@@ -44,7 +45,7 @@ export class SandboxGame {
         DomUtils.removeAllFocus();
         let { x, y } = InputController.getInstance().mousePosition;
         this.animationFrameId = window.requestAnimationFrame(this.update);
-        this.mousePlayer = new PhysicalCircle(new Vector(x, y), 200, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.player);
+        this.mousePlayer = new Player(new Vector(x, y));
         this.sandboxLayer.add(this.mousePlayer);
         this.groundLayer.drawer.clear();
         this.groundLayer.render();
@@ -52,7 +53,10 @@ export class SandboxGame {
 
     @boundMethod
     update() {
-        this.mousePlayer.position = this.sandboxLayer.drawer.getCanvasPositionFromWindowCoordonate(InputController.getInstance().mousePosition);
+        let mousePosition = this.sandboxLayer.drawer.getCanvasPositionFromWindowCoordonate(InputController.getInstance().mousePosition);
+        let separatingVector = mousePosition.clone().subtract(this.mousePlayer.position);
+        let oldPosition = this.mousePlayer.position.clone();
+        this.mousePlayer.move(separatingVector.unitarize().scale(this.mousePlayer.speed));
         let isColiding = false;
         for (let obstacle of SandboxGame.OBSTACLES) {
             if (this.coliderService.checkColision(this.mousePlayer, obstacle)) {
@@ -60,7 +64,12 @@ export class SandboxGame {
                 break;
             }
         }
-        this.mousePlayer.renderer = (isColiding) ? ObjectRenderer.enemies : ObjectRenderer.player;
+        if (isColiding) {
+            this.mousePlayer.renderer = ObjectRenderer.enemies
+            this.mousePlayer.position = oldPosition;
+        } else {
+            this.mousePlayer.renderer = ObjectRenderer.player;
+        }
         this.sandboxLayer.drawer.clear();
         this.sandboxLayer.render();
         this.animationFrameId = window.requestAnimationFrame(this.update);

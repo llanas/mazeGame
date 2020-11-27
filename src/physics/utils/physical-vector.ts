@@ -639,6 +639,10 @@ export default class Vector {
 
     norm = this.normalize;
 
+    unitarize(): Vector {
+        return new Vector(this.x / this.length, this.y / this.length);
+    }
+
     /**
      * If the absolute vector axis is greater than `max`, multiplies the axis by `factor`
      *
