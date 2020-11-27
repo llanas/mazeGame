@@ -19,10 +19,10 @@ export class SandboxGame {
     static PLAY_LAYER_CANVAS_ID = 'sandbox_play_layer';
 
     static OBSTACLES: PhysicalObject[] = [
-        new PhysicalRectangle(new Vector(10, 10), 2, 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
-        new PhysicalRectangle(new Vector(50, 50), 2, 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
-        new PhysicalCircle(new Vector(40, 40), 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
-        new PhysicalCircle(new Vector(80, 80), 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet)
+        new PhysicalRectangle(new Vector(100, 100), 100, 100, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
+        new PhysicalRectangle(new Vector(500, 500), 20, 100, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
+        new PhysicalCircle(new Vector(400, 400), 80, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet),
+        new PhysicalCircle(new Vector(800, 800), 60, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.bullet)
     ];
 
     public groundLayer: PhysicalLayer;
@@ -44,7 +44,7 @@ export class SandboxGame {
         DomUtils.removeAllFocus();
         let { x, y } = InputController.getInstance().mousePosition;
         this.animationFrameId = window.requestAnimationFrame(this.update);
-        this.mousePlayer = new PhysicalCircle(new Vector(x, y), 2, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.player);
+        this.mousePlayer = new PhysicalCircle(new Vector(x, y), 200, CONST_COLIDING_PARAMETERS.ONLY_COLIDING, ObjectRenderer.player);
         this.sandboxLayer.add(this.mousePlayer);
         this.groundLayer.drawer.clear();
         this.groundLayer.render();

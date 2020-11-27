@@ -11,8 +11,8 @@ export class Constants {
     static canvasOffsetTop = 0;
     static canvasOffsetLeft = 0;
 
-    static gameCanvasWidth = 100;
-    static gameCanvasHeight = 100;
+    static gameCanvasWidth = 1000;
+    static gameCanvasHeight = 1000;
 
     // PLAYER
     static defaultPlayerSpeed = 8;
