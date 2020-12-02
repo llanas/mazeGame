@@ -12,7 +12,7 @@ import { IMovable } from './interfaces/movable-interface';
 
 export default class Player extends PhysicalCircle implements ILiving, IMovable {
 
-    public life: number = 200;
+    public life: number = 100;
     public speed: number;
     public visibilityRadius: number = Constants.playerVisibilityRadius;
     public detonationOnCooldown: boolean = false;

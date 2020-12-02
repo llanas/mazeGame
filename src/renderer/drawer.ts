@@ -83,6 +83,13 @@ export class Drawer {
         }
     }
 
+    drawRay(rayPosition: Vector, rayVector: Vector) {
+        this.context.beginPath();
+        this.context.moveTo(rayPosition.x, rayPosition.y);
+        this.context.lineTo(rayVector.x, rayVector.y);
+        this.context.stroke();
+    }
+
     /**
      * Function that draw the player vision
      * It trace a sphere aroud the Player position based on his visibilityRadius

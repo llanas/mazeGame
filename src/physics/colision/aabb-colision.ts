@@ -1,3 +1,4 @@
+import { Utils } from '../../utils/utils';
 import PhysicalCircle from '../objects/physical-circle';
 import { PhysicalObject } from '../objects/physical-object';
 import PhysicalRectangle from '../objects/physical-rectangle';
@@ -7,8 +8,23 @@ import { IColision } from './colision-interface';
 
 export default class AABBColision implements IColision {
 
-    checkColision(objectA: PhysicalObject, objectB: PhysicalObject) {
+    checkPointColision(point: Vector, object: PhysicalObject) {
+        if (object instanceof PhysicalCircle) {
+            return this.checkPointAndCircleColision(point, object);
+        } else if (object instanceof PhysicalRectangle) {
+            return this.checkPointAndRectangleColision(point, object);
+        }
+    }
 
+    checkRayColision(rayPosition: Vector, rayVector: Vector, object: PhysicalObject) {
+        if (object instanceof PhysicalCircle) {
+            return this.checkRayAndCircleColision(rayPosition, rayVector, object);
+        } else if (object instanceof PhysicalRectangle) {
+            return this.checkRayAndRectangleColision(rayPosition, rayVector, object);
+        }
+    }
+
+    checkColision(objectA: PhysicalObject, objectB: PhysicalObject) {
         if (objectA instanceof PhysicalCircle) {
             if (objectB instanceof PhysicalCircle) {
                 return this.checkCirclesColision(objectA, objectB);
@@ -44,14 +60,24 @@ export default class AABBColision implements IColision {
         return Math.abs(relativeCirclePosition.clone().subtract(closestPointOnRay).length) <= circle.radius;
     }
 
-    // checkRayAndRectangleColision(rayPosition: Vector, rayVector: Vector, circle: PhysicalCircle): boolean {
-    //     if (this.checkPointAndCircleColision(rayPosition, circle)) return true;
-    //     let relativeCirclePosition = circle.position.clone().subtract(rayPosition);
-    //     // Project circle center on the
-    //     let closestPointOnRay = relativeCirclePosition.clone().projectOnto(rayVector);
-    //     if (closestPointOnRay.length > rayVector.length + circle.radius) return false;
-    //     return Math.abs(relativeCirclePosition.clone().subtract(closestPointOnRay).length) <= circle.radius;
-    // }
+    checkRayAndRectangleColision(rayPosition: Vector, rayVector: Vector, rectangle: PhysicalRectangle): boolean {
+        const nearestPointX = (rectangle.position.x - rayPosition.x) / rayVector.length;
+        const farestPointX = (rectangle.position.x + rectangle.width - rayPosition.x) / rayVector.length;
+
+        const nearestPointY = (rectangle.position.y - rayPosition.y) / rayVector.length;
+        const farestPointY = (rectangle.position.y + rectangle.height - rayPosition.y) / rayVector.length;
+
+        if (nearestPointX > farestPointX) Utils.swapObject(nearestPointX, farestPointX);
+        if (nearestPointY > farestPointY) Utils.swapObject(nearestPointY, farestPointY);
+
+        if (nearestPointX > farestPointY || nearestPointY > farestPointX) return false;
+
+        const nearestHit = Math.max(nearestPointX, nearestPointY);
+        const farestHit = Math.min(farestPointX, farestPointY);
+
+        if (farestHit < 0) return false;
+        return true;
+    }
 
     checkCirclesColision(circleA: PhysicalCircle, circleB: PhysicalCircle): boolean {
         return Math.abs(circleB.position.clone().subtract(circleA.position).length) <= circleA.radius + circleB.radius;
@@ -94,5 +120,17 @@ export default class AABBColision implements IColision {
             return true;
         }
         return false;
+    }
+
+    solveColision(objectA: PhysicalObject, objectB: PhysicalObject) {
+        if (objectA.colidingParameters.movable && !objectB.colidingParameters.movable) {
+            // A is movable and B not
+
+        } else if (!objectA.colidingParameters.movable && objectB.colidingParameters.movable) {
+            // B is movable and A not
+
+        } else {
+            // Both A and B are movable...
+        }
     }
 }
